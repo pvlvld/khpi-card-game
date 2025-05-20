@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  login     String?  @unique
+  email     String?  @unique
+  password  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  oauthProviders OAuthProvider[]
+  sessions       Session[]
+  gamesAsWinner  Game[]  @relation("Winner")
+  gamesAsLoser   Game[]  @relation("Loser")
+
+  @@map("user")
+}
+
+model OAuthProvider {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  provider   String
+  providerId String   @map("provider_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("oauth_provider")
+}
+
+model Session {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  sessionToken String   @unique @map("session_token")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Game {
+  id        Int      @id @default(autoincrement())
+  winnerId  Int      @map("winner_id")
+  loserId   Int      @map("loser_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  winner User @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
+  loser  User @relation("Loser", fields: [loserId], references: [id], onDelete: SetNull)
+
+  @@map("game")
+}
+
