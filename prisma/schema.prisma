@@ -59,13 +59,13 @@ model Session {
 
 model Game {
   id        Int      @id @default(autoincrement())
-  winnerId  Int      @map("winner_id")
-  loserId   Int      @map("loser_id")
+  winnerId  Int?      @map("winner_id")
+  loserId   Int?      @map("loser_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  winner User @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
-  loser  User @relation("Loser", fields: [loserId], references: [id], onDelete: SetNull)
+  winner User? @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
+  loser  User? @relation("Loser", fields: [loserId], references: [id], onDelete: SetNull)
 
   @@map("game")
 }
