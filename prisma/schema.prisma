@@ -29,13 +29,19 @@ model User {
   @@map("user")
 }
 
+enum OAuthProviderType {
+  Google
+  GitHub
+  Telegram
+}
+
 model OAuthProvider {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
-  provider   String   @db.VarChar(50)
-  providerId String   @map("provider_id") @db.VarChar(255)
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+  id         Int                @id @default(autoincrement())
+  userId     Int                @map("user_id")
+  provider   OAuthProviderType
+  providerId String             @map("provider_id") @db.VarChar(255)
+  createdAt  DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime           @updatedAt @map("updated_at") @db.Timestamp(6)
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
