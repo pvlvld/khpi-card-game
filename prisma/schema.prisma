@@ -16,16 +16,15 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  login     String?  @unique
-  email     String?  @unique
-  password  String?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  username  String   @unique @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  // Relations
   oauthProviders OAuthProvider[]
-  sessions       Session[]
-  gamesAsWinner  Game[]  @relation("Winner")
-  gamesAsLoser   Game[]  @relation("Loser")
+  gamesAsWinner  Game[]         @relation("Winner")
+  gamesAsLoser   Game[]         @relation("Loser")
+  accounts       Account[]
 
   @@map("user")
 }
@@ -33,24 +32,40 @@ model User {
 model OAuthProvider {
   id         Int      @id @default(autoincrement())
   userId     Int      @map("user_id")
-  provider   String
-  providerId String   @map("provider_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  provider   String   @db.VarChar(50)
+  providerId String   @map("provider_id") @db.VarChar(255)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerId])
   @@map("oauth_provider")
 }
 
+model Account {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  provider     String   @db.VarChar(50)
+  providerId   String   @map("provider_id") @db.VarChar(100)
+  passwordHash String?  @map("password_hash") @db.VarChar(255)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@map("accounts")
+}
+
 model Game {
   id        Int      @id @default(autoincrement())
   winnerId  Int?      @map("winner_id")
   loserId   Int?      @map("loser_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  // Relations
   winner User? @relation("Winner", fields: [winnerId], references: [id], onDelete: SetNull)
   loser  User? @relation("Loser", fields: [loserId], references: [id], onDelete: SetNull)
 

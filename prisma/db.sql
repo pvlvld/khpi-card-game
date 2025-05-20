@@ -1,8 +1,6 @@
 CREATE TABLE user (
     id SERIAL PRIMARY KEY,
-    login VARCHAR(50) UNIQUE,
-    email VARCHAR(255) UNIQUE, -- Nullable for OAuth users
-    password VARCHAR(255), -- Can be NULL for users registered via OAuth
+    username VARCHAR(50) UNIQUE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -17,13 +15,14 @@ CREATE TABLE oauth_provider (
     UNIQUE (provider, provider_id)
 );
 
-CREATE TABLE session (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    session_token VARCHAR(255) UNIQUE NOT NULL,
-    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE accounts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id CHAR(36) NOT NULL,
+  provider VARCHAR(50) NOT NULL,    -- "credentials", "google", "github", etc.
+  provider_id VARCHAR(100) NOT NULL,     -- provider ID / user_id for local auth
+  password_hash VARCHAR(255),            -- "credentials" aka local auth
+  UNIQUE KEY (provider, provider_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- A tie? nah! :D
