@@ -11,8 +11,4 @@ export class AccountService {
   ): Promise<Account | null> {
     return this.prisma.account.findUnique({where});
   }
-
-  async test() {
-    return this.prisma.account.findUnique({where: {username: "test"}});
-  }
 }
