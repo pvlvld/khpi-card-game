@@ -6,6 +6,8 @@ import {UsersModule} from "./users/users.module";
 import {GamesModule} from "./games/games.module";
 import {MatchmakingModule} from "./matchmaking/matchmaking.module";
 import {StatsModule} from "./stats/stats.module";
+import {PrismaService} from "./prisma/prisma.service";
+import {UsersService} from "./users/users.service";
 
 @Module({
   imports: [
@@ -16,6 +18,6 @@ import {StatsModule} from "./stats/stats.module";
     StatsModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService, PrismaService, UsersService]
 })
 export class AppModule {}
