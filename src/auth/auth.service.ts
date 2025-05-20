@@ -1,5 +1,5 @@
 import {Injectable, UnauthorizedException} from "@nestjs/common";
-import argon2 from "@node-rs/argon2";
+import * as argon2 from "@node-rs/argon2";
 import {AccountService} from "src/account/account.service";
 @Injectable()
 export class AuthService {
