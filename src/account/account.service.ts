@@ -11,4 +11,8 @@ export class AccountService {
   ): Promise<Account | null> {
     return this.prisma.account.findUnique({where});
   }
+
+  async create(data: Prisma.AccountCreateInput): Promise<Account> {
+    return this.prisma.account.create({data});
+  }
 }
