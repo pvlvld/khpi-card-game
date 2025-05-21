@@ -1,12 +1,24 @@
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
 
+const ALLOWED_CORS_ORIGINS = [
+  "http://localhost",
+  "http://127.0.0.1",
+  "https://localhost",
+  "https://127.0.0.1"
+];
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || origin.startsWith("http://localhost:")) {
+      if (
+        !origin ||
+        ALLOWED_CORS_ORIGINS.some((allowedOrigin) =>
+          origin.startsWith(allowedOrigin)
+        )
+      ) {
         return callback(null, true);
       }
 
