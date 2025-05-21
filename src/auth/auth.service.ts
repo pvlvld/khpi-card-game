@@ -5,6 +5,7 @@ import {
 } from "@nestjs/common";
 import {JwtService} from "@nestjs/jwt";
 import * as argon2 from "@node-rs/argon2";
+import {Account} from "generated/prisma";
 import {AccountService} from "src/account/account.service";
 import {PrismaService} from "src/prisma/prisma.service";
 
@@ -60,13 +61,29 @@ export class AuthService {
 
     const account = await this.accountService.findUnique({username});
 
+    return await this.login(account!);
+  }
+
+  async validateUser(
+    username: string,
+    password: string
+  ): Promise<Account | null> {
+    const account = await this.accountService.findUnique({username});
+
     if (
       !account?.passwordHash ||
       !(await argon2.verify(account.passwordHash, password))
     ) {
-      throw new UnauthorizedException();
+      return null;
     }
 
-    return await this.jwtService.signAsync({sub: account.id, username});
+    return account;
+  }
+
+  async login(account: Account): Promise<string> {
+    return this.jwtService.signAsync({
+      sub: account.id,
+      username: account.username
+    });
   }
 }
