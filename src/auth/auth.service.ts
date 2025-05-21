@@ -17,6 +17,10 @@ export class AuthService {
   ) {}
 
   async signUp(username: string, password: string): Promise<any> {
+    if (!username || !password) {
+      throw new UnauthorizedException("Username and password are required");
+    }
+
     const existingUser = await this.accountService.findUnique({username});
     if (existingUser) {
       throw new ConflictException("Username already exists");
@@ -49,7 +53,11 @@ export class AuthService {
   }
 
   // TODO: OAuth
-  async signIn(username: string, password: string): Promise<any> {
+  async signIn(username: string, password: string): Promise<string> {
+    if (!username || !password) {
+      throw new UnauthorizedException("Username and password are required");
+    }
+
     const account = await this.accountService.findUnique({username});
 
     if (
