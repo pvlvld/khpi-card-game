@@ -1,5 +1,6 @@
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
+import * as cookieParser from "cookie-parser";
 
 const ALLOWED_CORS_ORIGINS = [
   "http://localhost",
@@ -28,6 +29,8 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: "Content-Type, Accept, Authorization"
   });
+
+  app.use(cookieParser());
 
   await app.listen(process.env.NEST_PORT ?? 3069);
 }
