@@ -18,8 +18,15 @@ export class AuthController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post("register")
-  signUp(@Body() signUpDto: Record<string, any>) {
-    return this.authService.signUp(signUpDto.username, signUpDto.password);
+  async signUp(@Body() signUpDto: Record<string, any>, @Res() response: Response) {
+    const jwt = await this.authService.signUp(signUpDto.username, signUpDto.password);
+
+    const expires = new Date();
+    expires.setDate(expires.getDate() + 30);
+    response.cookie("jwt", jwt, {expires, httpOnly: true});
+    response.status(HttpStatus.CREATED).json({
+      message: "Registration successful"
+    });
   }
 
   @HttpCode(HttpStatus.OK)
