@@ -22,8 +22,8 @@ model User {
 
   // Relations
   oauthProviders OAuthProvider[]
-  gamesAsWinner  Game[]         @relation("Winner")
-  gamesAsLoser   Game[]         @relation("Loser")
+  gamesAsWinner  Game[]          @relation("Winner")
+  gamesAsLoser   Game[]          @relation("Loser")
   accounts       Account[]
 
   @@map("user")
@@ -36,12 +36,12 @@ enum OAuthProviderType {
 }
 
 model OAuthProvider {
-  id         Int                @id @default(autoincrement())
-  userId     Int                @map("user_id")
+  id         Int               @id @default(autoincrement())
+  userId     Int               @map("user_id")
   provider   OAuthProviderType
-  providerId String             @map("provider_id") @db.VarChar(255)
-  createdAt  DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt  DateTime           @updatedAt @map("updated_at") @db.Timestamp(6)
+  providerId String            @map("provider_id") @db.VarChar(255)
+  createdAt  DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -51,12 +51,12 @@ model OAuthProvider {
 }
 
 model Account {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
-  username     String   @unique @db.VarChar(50)
-  provider     String   @db.VarChar(50)
-  providerId   String   @map("provider_id") @db.VarChar(100)
-  passwordHash String?  @map("password_hash") @db.VarChar(255)
+  id           Int     @id @default(autoincrement())
+  userId       Int     @map("user_id")
+  username     String  @unique @db.VarChar(50)
+  provider     String  @db.VarChar(50)
+  providerId   String  @map("provider_id") @db.VarChar(100)
+  passwordHash String? @map("password_hash") @db.VarChar(255)
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -67,8 +67,8 @@ model Account {
 
 model Game {
   id        Int      @id @default(autoincrement())
-  winnerId  Int?      @map("winner_id")
-  loserId   Int?      @map("loser_id")
+  winnerId  Int?     @map("winner_id")
+  loserId   Int?     @map("loser_id")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
@@ -83,7 +83,7 @@ model Card {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   description String?  @db.Text
-  imageUrl    String  @map("image_url") @db.VarChar(255)
+  imageUrl    String   @map("image_url") @db.VarChar(255)
   health      Int
   damage      Int
   cost        Int
@@ -93,4 +93,3 @@ model Card {
   @@unique([name])
   @@map("cards")
 }
-
