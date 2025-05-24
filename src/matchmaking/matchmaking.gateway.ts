@@ -1,4 +1,5 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import { forwardRef, Inject } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { MatchmakingService } from './matchmaking.service';
 
@@ -11,7 +12,10 @@ export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconn
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly matchmakingService: MatchmakingService) {}
+  constructor(
+    @Inject(forwardRef(() => MatchmakingService))
+    private readonly matchmakingService: MatchmakingService
+  ) {}
 
   async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);

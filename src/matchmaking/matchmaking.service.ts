@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { MatchmakingGateway } from './matchmaking.gateway';
 
 interface QueuedPlayer {
@@ -20,7 +20,10 @@ export class MatchmakingService {
   private readonly matches: Map<string, Match> = new Map();
   private readonly COUNTDOWN_SECONDS = 5; // Configurable countdown time
 
-  constructor(private readonly matchmakingGateway: MatchmakingGateway) {}
+  constructor(
+    @Inject(forwardRef(() => MatchmakingGateway))
+    private readonly matchmakingGateway: MatchmakingGateway
+  ) {}
 
   async addToQueue(socketId: string) {
     if (this.queue.some(player => player.socketId === socketId)) {
