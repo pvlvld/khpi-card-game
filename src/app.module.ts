@@ -10,6 +10,7 @@ import {PrismaService} from "./prisma/prisma.service";
 import {UsersService} from "./user/user.service";
 import { AccountService } from './account/account.service';
 import { AccountModule } from './account/account.module';
+import { CardService } from './card/card.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { AccountModule } from './account/account.module';
     AccountModule
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UsersService, AccountService]
+  providers: [AppService, PrismaService, UsersService, AccountService, CardService]
 })
 export class AppModule {}
