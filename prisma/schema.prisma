@@ -79,3 +79,17 @@ model Game {
   @@map("game")
 }
 
+model Card {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  imageUrl    String  @map("image_url") @db.VarChar(255)
+  health      Int
+  damage      Int
+  cost        Int
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("cards")
+}
+
