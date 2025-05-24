@@ -8,9 +8,9 @@ import {MatchmakingModule} from "./matchmaking/matchmaking.module";
 import {StatsModule} from "./stats/stats.module";
 import {PrismaService} from "./prisma/prisma.service";
 import {UsersService} from "./user/user.service";
-import { AccountService } from './account/account.service';
-import { AccountModule } from './account/account.module';
-import { CardService } from './card/card.service';
+import {AccountService} from "./account/account.service";
+import {AccountModule} from "./account/account.module";
+import {CardService} from "./card/card.service";
 
 @Module({
   imports: [
@@ -22,6 +22,12 @@ import { CardService } from './card/card.service';
     AccountModule
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService, UsersService, AccountService, CardService]
+  providers: [
+    AppService,
+    PrismaService,
+    UsersService,
+    AccountService,
+    CardService
+  ]
 })
 export class AppModule {}

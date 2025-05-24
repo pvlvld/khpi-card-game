@@ -1,14 +1,22 @@
-import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { forwardRef, Inject } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
-import { MatchmakingService } from './matchmaking.service';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  SubscribeMessage,
+  OnGatewayConnection,
+  OnGatewayDisconnect
+} from "@nestjs/websockets";
+import {forwardRef, Inject} from "@nestjs/common";
+import {Server, Socket} from "socket.io";
+import {MatchmakingService} from "./matchmaking.service";
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
-  },
+    origin: "*"
+  }
 })
-export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class MatchmakingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -26,18 +34,18 @@ export class MatchmakingGateway implements OnGatewayConnection, OnGatewayDisconn
     await this.matchmakingService.removeFromQueue(client.id);
   }
 
-  @SubscribeMessage('joinQueue')
+  @SubscribeMessage("joinQueue")
   async handleJoinQueue(client: Socket) {
     await this.matchmakingService.addToQueue(client.id);
   }
 
-  @SubscribeMessage('leaveQueue')
+  @SubscribeMessage("leaveQueue")
   async handleLeaveQueue(client: Socket) {
     await this.matchmakingService.removeFromQueue(client.id);
   }
 
-  @SubscribeMessage('cancelMatch')
+  @SubscribeMessage("cancelMatch")
   async handleCancelMatch(client: Socket) {
     await this.matchmakingService.cancelMatch(client.id);
   }
-} 
+}

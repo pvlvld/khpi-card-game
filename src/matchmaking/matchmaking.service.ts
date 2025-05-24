@@ -1,5 +1,5 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
-import { MatchmakingGateway } from './matchmaking.gateway';
+import {Injectable, Logger, Inject, forwardRef} from "@nestjs/common";
+import {MatchmakingGateway} from "./matchmaking.gateway";
 
 interface QueuedPlayer {
   socketId: string;
@@ -26,17 +26,19 @@ export class MatchmakingService {
   ) {}
 
   async addToQueue(socketId: string) {
-    if (this.queue.some(player => player.socketId === socketId)) {
+    if (this.queue.some((player) => player.socketId === socketId)) {
       return;
     }
 
-    this.queue.push({ socketId });
+    this.queue.push({socketId});
     this.logger.log(`Player ${socketId} joined the queue`);
     this.tryMatchPlayers();
   }
 
   async removeFromQueue(socketId: string) {
-    const index = this.queue.findIndex(player => player.socketId === socketId);
+    const index = this.queue.findIndex(
+      (player) => player.socketId === socketId
+    );
     if (index !== -1) {
       this.queue.splice(index, 1);
       this.logger.log(`Player ${socketId} left the queue`);
@@ -44,14 +46,14 @@ export class MatchmakingService {
   }
 
   async cancelMatch(socketId: string) {
-    const match = Array.from(this.matches.values()).find(
-      match => match.players.includes(socketId)
+    const match = Array.from(this.matches.values()).find((match) =>
+      match.players.includes(socketId)
     );
 
     if (match) {
       match.cancelled = true;
-      match.players.forEach(playerId => {
-        this.matchmakingGateway.server.to(playerId).emit('matchCancelled');
+      match.players.forEach((playerId) => {
+        this.matchmakingGateway.server.to(playerId).emit("matchCancelled");
         // this.addToQueue(playerId); // Re-add players to queue???
       });
       this.matches.delete(match.id);
@@ -66,7 +68,7 @@ export class MatchmakingService {
       if (!player1 || !player2) continue;
 
       const matchId = `match_${Date.now()}`;
-      const startTime = Date.now() + (this.COUNTDOWN_SECONDS * 1000);
+      const startTime = Date.now() + this.COUNTDOWN_SECONDS * 1000;
 
       const match: Match = {
         id: matchId,
@@ -78,8 +80,8 @@ export class MatchmakingService {
       this.matches.set(matchId, match);
 
       // Notify players
-      [player1.socketId, player2.socketId].forEach(socketId => {
-        this.matchmakingGateway.server.to(socketId).emit('matchFound', {
+      [player1.socketId, player2.socketId].forEach((socketId) => {
+        this.matchmakingGateway.server.to(socketId).emit("matchFound", {
           matchId,
           startTime,
           countdown: this.COUNTDOWN_SECONDS
@@ -90,10 +92,10 @@ export class MatchmakingService {
       setTimeout(() => {
         const currentMatch = this.matches.get(matchId);
         if (currentMatch && !currentMatch.cancelled) {
-          currentMatch.players.forEach(socketId => {
-            this.matchmakingGateway.server.to(socketId).emit('gameStart', {
+          currentMatch.players.forEach((socketId) => {
+            this.matchmakingGateway.server.to(socketId).emit("gameStart", {
               matchId,
-              opponent: currentMatch.players.find(p => p !== socketId)
+              opponent: currentMatch.players.find((p) => p !== socketId)
             });
           });
           this.matches.delete(matchId);
