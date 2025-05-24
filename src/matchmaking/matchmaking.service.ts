@@ -67,8 +67,9 @@ export class MatchmakingService {
 
       if (!player1 || !player2) continue;
 
-      const matchId = `match_${Date.now()}`;
-      const startTime = Date.now() + this.COUNTDOWN_SECONDS * 1000;
+      const dateNow = Date.now();
+      const matchId = `match_${dateNow}`;
+      const startTime = dateNow + this.COUNTDOWN_SECONDS * 1000;
 
       const match: Match = {
         id: matchId,
