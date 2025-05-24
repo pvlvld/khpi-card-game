@@ -90,6 +90,7 @@ model Card {
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  @@unique([name])
   @@map("cards")
 }
 
