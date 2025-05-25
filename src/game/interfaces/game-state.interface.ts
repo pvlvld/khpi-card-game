@@ -7,6 +7,7 @@ export interface PlayerState {
   coins: number;
   cards: Card[];
   playedCards: Card[];
+  cardsOnDesk: Card["name"][];
   hasPassed: boolean;
 }
 
@@ -43,5 +44,6 @@ export interface PublicGameState {
     coins: number;
     cardsCount: number;
     hasPassed: boolean;
+    cardsOnDesk: Card["name"][];
   }[];
-} 
+}
