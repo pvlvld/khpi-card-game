@@ -1,4 +1,4 @@
-import { Card as DatabaseCard } from "generated/prisma";
+import {Card as DatabaseCard} from "generated/prisma";
 
 export interface PlayerState {
   socketId: string;
@@ -7,7 +7,6 @@ export interface PlayerState {
   coins: number;
   cards: Card[];
   playedCards: Card[];
-  cardsOnDesk: Card["name"][];
   hasPassed: boolean;
 }
 
@@ -43,7 +42,8 @@ export interface PublicGameState {
     hp: number;
     coins: number;
     cardsCount: number;
+    cards: Card[] | null;
+    playedCards: Card[];
     hasPassed: boolean;
-    cardsOnDesk: Card["name"][];
   }[];
 }

@@ -112,6 +112,7 @@ export class GamesService {
       coins: this.gameConfig.initialCoins,
       cards,
       playedCards: [],
+      cardsOnDesk: [],
       hasPassed: false
     };
   }
@@ -170,7 +171,10 @@ export class GamesService {
     }
   }
 
-  private getPublicGameState(gameState: GameState, forPlayerIndex: number): PublicGameState {
+  private getPublicGameState(
+    gameState: GameState,
+    forPlayerIndex: number
+  ): PublicGameState {
     const currentPlayer = gameState.players[forPlayerIndex];
     const opponent = gameState.players[1 - forPlayerIndex];
 
@@ -187,6 +191,8 @@ export class GamesService {
           hp: currentPlayer.hp,
           coins: currentPlayer.coins,
           cardsCount: currentPlayer.cards.length,
+          cards: currentPlayer.cards,
+          playedCards: currentPlayer.playedCards,
           hasPassed: currentPlayer.hasPassed
         },
         {
@@ -194,6 +200,8 @@ export class GamesService {
           hp: opponent.hp,
           coins: opponent.coins,
           cardsCount: opponent.cards.length,
+          cards: null,
+          playedCards: opponent.playedCards,
           hasPassed: opponent.hasPassed
         }
       ]
