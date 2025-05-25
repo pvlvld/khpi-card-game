@@ -3,12 +3,14 @@ import {MatchmakingGateway} from "./matchmaking.gateway";
 
 interface QueuedPlayer {
   socketId: string;
+  playerName: string;
   matchId?: string;
 }
 
 interface Match {
   id: string;
   players: string[];
+  playerNames: string[];
   startTime: number;
   cancelled: boolean;
 }
@@ -25,13 +27,13 @@ export class MatchmakingService {
     private readonly matchmakingGateway: MatchmakingGateway
   ) {}
 
-  async addToQueue(socketId: string) {
+  async addToQueue(socketId: string, playerName: string) {
     if (this.queue.some((player) => player.socketId === socketId)) {
       return;
     }
 
-    this.queue.push({socketId});
-    this.logger.log(`Player ${socketId} joined the queue`);
+    this.queue.push({ socketId, playerName });
+    this.logger.log(`Player ${playerName} (${socketId}) joined the queue`);
     this.tryMatchPlayers();
   }
 
@@ -74,22 +76,24 @@ export class MatchmakingService {
       const match: Match = {
         id: matchId,
         players: [player1.socketId, player2.socketId],
+        playerNames: [player1.playerName, player2.playerName],
         startTime,
         cancelled: false
       };
 
       this.matches.set(matchId, match);
 
-      // Notify players
-      [player1.socketId, player2.socketId].forEach((socketId) => {
+      // Notify players, передаем имена противников
+      [player1.socketId, player2.socketId].forEach((socketId, idx) => {
         this.matchmakingGateway.server.to(socketId).emit("matchFound", {
           matchId,
           startTime,
-          countdown: this.COUNTDOWN_SECONDS
+          countdown: this.COUNTDOWN_SECONDS,
+          opponentName: [player1.playerName, player2.playerName][1 - idx], // имя оппонента
         });
       });
 
-      // Start countdown
+      // Start countdown (оставляем без изменений)
       setTimeout(() => {
         const currentMatch = this.matches.get(matchId);
         if (currentMatch && !currentMatch.cancelled) {
@@ -104,4 +108,5 @@ export class MatchmakingService {
       }, this.COUNTDOWN_SECONDS * 1000);
     }
   }
+
 }

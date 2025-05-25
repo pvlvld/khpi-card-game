@@ -8,10 +8,12 @@ import {
 import {forwardRef, Inject} from "@nestjs/common";
 import {Server, Socket} from "socket.io";
 import {MatchmakingService} from "./matchmaking.service";
+import * as jwt from 'jsonwebtoken';
 
 @WebSocketGateway({
   cors: {
-    origin: "*"
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
   }
 })
 export class MatchmakingGateway
@@ -36,7 +38,34 @@ export class MatchmakingGateway
 
   @SubscribeMessage("joinQueue")
   async handleJoinQueue(client: Socket) {
-    await this.matchmakingService.addToQueue(client.id);
+    // Parsing cookie
+    const cookieHeader = client.handshake.headers.cookie || '';
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=');
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, string>);
+
+    const token = cookies['jwt'];
+    if (!token) {
+      client.emit('error', 'No JWT token provided');
+      return;
+    }
+
+    let payload;
+    try {
+      payload = jwt.decode(token) as { username?: string };
+    } catch (e) {
+      client.emit('error', 'Invalid JWT token');
+      return;
+    }
+
+    if (!payload?.username) {
+      client.emit('error', 'Invalid JWT payload');
+      return;
+    }
+
+    await this.matchmakingService.addToQueue(client.id, payload.username);
   }
 
   @SubscribeMessage("leaveQueue")
