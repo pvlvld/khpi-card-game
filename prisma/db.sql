@@ -39,9 +39,9 @@ CREATE TABLE cards (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     image_url VARCHAR(255),
-    health INTEGER NOT NULL,
-    damage INTEGER NOT NULL,
     cost INTEGER NOT NULL,
+    damage INTEGER NOT NULL,
+    defence INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (name)
