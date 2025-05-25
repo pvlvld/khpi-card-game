@@ -45,12 +45,16 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: {gameId: number; userId: number}
   ) {
     try {
-      const gameState = await this.gamesService.joinGame(client.id, data.gameId, data.userId);
-      return { success: true, data: gameState };
+      const gameState = await this.gamesService.joinGame(
+        client.id,
+        data.gameId,
+        data.userId
+      );
+      return {success: true, data: gameState};
     } catch (error) {
       this.logger.error(`Error joining game: ${error.message}`);
-      client.emit('error', { message: error.message });
-      return { success: false, error: error.message };
+      client.emit("error", {message: error.message});
+      return {success: false, error: error.message};
     }
   }
 
@@ -60,12 +64,16 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: {gameId: number; cardId: number}
   ) {
     try {
-      const gameState = await this.gamesService.playCard(client.id, data.gameId, data.cardId);
-      return { success: true, data: gameState };
+      const gameState = await this.gamesService.playCard(
+        client.id,
+        data.gameId,
+        data.cardId
+      );
+      return {success: true, data: gameState};
     } catch (error) {
       this.logger.error(`Error playing card: ${error.message}`);
-      client.emit('error', { message: error.message });
-      return { success: false, error: error.message };
+      client.emit("error", {message: error.message});
+      return {success: false, error: error.message};
     }
   }
 
@@ -75,12 +83,15 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: {gameId: number}
   ) {
     try {
-      const gameState = await this.gamesService.passRound(client.id, data.gameId);
-      return { success: true, data: gameState };
+      const gameState = await this.gamesService.passRound(
+        client.id,
+        data.gameId
+      );
+      return {success: true, data: gameState};
     } catch (error) {
       this.logger.error(`Error passing round: ${error.message}`);
-      client.emit('error', { message: error.message });
-      return { success: false, error: error.message };
+      client.emit("error", {message: error.message});
+      return {success: false, error: error.message};
     }
   }
 }

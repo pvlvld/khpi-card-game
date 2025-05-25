@@ -2,48 +2,54 @@ import {Injectable, Logger} from "@nestjs/common";
 import {Game, Prisma, Card as PrismaCard} from "generated/prisma";
 import {PrismaService} from "src/prisma/prisma.service";
 import {CardService} from "src/card/card.service";
-import {GameState, PlayerState, GameConfig, Card, PublicGameState} from "./interfaces/game-state.interface";
+import {
+  GameState,
+  PlayerState,
+  GameConfig,
+  Card,
+  PublicGameState
+} from "./interfaces/game-state.interface";
 import {Server} from "socket.io";
 
 class GameError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'GameError';
+    this.name = "GameError";
   }
 }
 
 class GameNotFoundError extends GameError {
   constructor(gameId: number) {
     super(`Game not found: ${gameId}`);
-    this.name = 'GameNotFoundError';
+    this.name = "GameNotFoundError";
   }
 }
 
 class PlayerNotFoundError extends GameError {
   constructor(userId: number) {
     super(`Player not found: ${userId}`);
-    this.name = 'PlayerNotFoundError';
+    this.name = "PlayerNotFoundError";
   }
 }
 
 class NotYourTurnError extends GameError {
   constructor() {
-    super('Not your turn');
-    this.name = 'NotYourTurnError';
+    super("Not your turn");
+    this.name = "NotYourTurnError";
   }
 }
 
 class CardNotFoundError extends GameError {
   constructor(cardId: number) {
     super(`Card not found: ${cardId}`);
-    this.name = 'CardNotFoundError';
+    this.name = "CardNotFoundError";
   }
 }
 
 class NotEnoughCoinsError extends GameError {
   constructor(required: number, available: number) {
     super(`Not enough coins. Required: ${required}, Available: ${available}`);
-    this.name = 'NotEnoughCoinsError';
+    this.name = "NotEnoughCoinsError";
   }
 }
 
@@ -94,8 +100,10 @@ export class GamesService {
   }
 
   private async initializePlayerState(userId: number): Promise<PlayerState> {
-    const prismaCards = await this.cardService.getRandomCards(this.gameConfig.initialCards);
-    const cards: Card[] = prismaCards.map(card => ({
+    const prismaCards = await this.cardService.getRandomCards(
+      this.gameConfig.initialCards
+    );
+    const cards: Card[] = prismaCards.map((card) => ({
       id: card.id,
       name: card.name,
       description: card.description,
@@ -112,18 +120,21 @@ export class GamesService {
       coins: this.gameConfig.initialCoins,
       cards,
       playedCards: [],
-      cardsOnDesk: [],
       hasPassed: false
     };
   }
 
-  async joinGame(socketId: string, gameId: number, userId: number): Promise<GameState> {
+  async joinGame(
+    socketId: string,
+    gameId: number,
+    userId: number
+  ): Promise<GameState> {
     const gameState = this.activeGames.get(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
 
-    const playerIndex = gameState.players.findIndex(p => p.userId === userId);
+    const playerIndex = gameState.players.findIndex((p) => p.userId === userId);
     if (playerIndex === -1) {
       throw new PlayerNotFoundError(userId);
     }
@@ -134,10 +145,16 @@ export class GamesService {
 
   async handlePlayerDisconnect(socketId: string) {
     for (const [gameId, gameState] of this.activeGames.entries()) {
-      const playerIndex = gameState.players.findIndex(p => p.socketId === socketId);
+      const playerIndex = gameState.players.findIndex(
+        (p) => p.socketId === socketId
+      );
       if (playerIndex !== -1) {
         // Handle player disconnect - mark them as loser
-        await this.endGame(gameId, gameState.players[1 - playerIndex].userId, gameState.players[playerIndex].userId);
+        await this.endGame(
+          gameId,
+          gameState.players[1 - playerIndex].userId,
+          gameState.players[playerIndex].userId
+        );
         break;
       }
     }
@@ -153,9 +170,12 @@ export class GamesService {
       const currentGameState = this.activeGames.get(gameId);
       if (!currentGameState || currentGameState.isFinished) return;
 
-      const currentPlayer = currentGameState.players[currentGameState.currentPlayerIndex];
-      this.logger.log(`Turn time limit reached for player ${currentPlayer.userId} in game ${gameId}`);
-      
+      const currentPlayer =
+        currentGameState.players[currentGameState.currentPlayerIndex];
+      this.logger.log(
+        `Turn time limit reached for player ${currentPlayer.userId} in game ${gameId}`
+      );
+
       // Auto pass the round
       await this.passRound(currentPlayer.socketId, gameId);
     }, this.gameConfig.turnTimeLimit * 1000);
@@ -212,24 +232,30 @@ export class GamesService {
     gameState.players.forEach((player, index) => {
       if (player.socketId) {
         const publicState = this.getPublicGameState(gameState, index);
-        this.server?.to(player.socketId).emit('gameStateUpdate', publicState);
+        this.server?.to(player.socketId).emit("gameStateUpdate", publicState);
       }
     });
   }
 
-  async playCard(socketId: string, gameId: number, cardId: number): Promise<GameState> {
+  async playCard(
+    socketId: string,
+    gameId: number,
+    cardId: number
+  ): Promise<GameState> {
     const gameState = this.activeGames.get(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
 
-    const playerIndex = gameState.players.findIndex(p => p.socketId === socketId);
+    const playerIndex = gameState.players.findIndex(
+      (p) => p.socketId === socketId
+    );
     if (playerIndex === -1 || playerIndex !== gameState.currentPlayerIndex) {
       throw new NotYourTurnError();
     }
 
     const player = gameState.players[playerIndex];
-    const cardIndex = player.cards.findIndex(c => c.id === cardId);
+    const cardIndex = player.cards.findIndex((c) => c.id === cardId);
     if (cardIndex === -1) {
       throw new CardNotFoundError(cardId);
     }
@@ -263,7 +289,9 @@ export class GamesService {
       throw new GameNotFoundError(gameId);
     }
 
-    const playerIndex = gameState.players.findIndex(p => p.socketId === socketId);
+    const playerIndex = gameState.players.findIndex(
+      (p) => p.socketId === socketId
+    );
     if (playerIndex === -1) {
       throw new PlayerNotFoundError(gameState.players[0].userId); // Use first player as fallback
     }
@@ -301,8 +329,16 @@ export class GamesService {
     const damage2 = this.calculateDamage(player2.playedCards);
 
     // Apply damage
-    player2.hp = Math.max(0, player2.hp - Math.max(0, damage1 - this.calculateDefence(player2.playedCards)));
-    player1.hp = Math.max(0, player1.hp - Math.max(0, damage2 - this.calculateDefence(player1.playedCards)));
+    player2.hp = Math.max(
+      0,
+      player2.hp -
+        Math.max(0, damage1 - this.calculateDefence(player2.playedCards))
+    );
+    player1.hp = Math.max(
+      0,
+      player1.hp -
+        Math.max(0, damage2 - this.calculateDefence(player1.playedCards))
+    );
 
     // Check for game end
     if (player1.hp === 0 || player2.hp === 0) {
@@ -327,7 +363,7 @@ export class GamesService {
       const prismaCards = await this.cardService.getRandomCards(
         this.gameConfig.initialCards - player.cards.length
       );
-      const newCards: Card[] = prismaCards.map(card => ({
+      const newCards: Card[] = prismaCards.map((card) => ({
         id: card.id,
         name: card.name,
         description: card.description,

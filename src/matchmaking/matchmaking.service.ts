@@ -51,13 +51,15 @@ export class MatchmakingService {
 
   async cancelMatch(socketId: string) {
     const match = Array.from(this.matches.values()).find((match) =>
-      match.players.some(p => p.socketId === socketId)
+      match.players.some((p) => p.socketId === socketId)
     );
 
     if (match) {
       match.cancelled = true;
       match.players.forEach((player) => {
-        this.matchmakingGateway.server.to(player.socketId).emit("matchCancelled");
+        this.matchmakingGateway.server
+          .to(player.socketId)
+          .emit("matchCancelled");
         // this.addToQueue(player.socketId, player.userId); // Re-add players to queue???
       });
       this.matches.delete(match.id);
@@ -105,18 +107,27 @@ export class MatchmakingService {
 
             // Notify players and provide game connection info
             currentMatch.players.forEach((player) => {
-              this.matchmakingGateway.server.to(player.socketId).emit("gameStart", {
-                matchId,
-                gameId: game.id,
-                opponent: currentMatch.players.find((p) => p.socketId !== player.socketId)?.userId
-              });
+              this.matchmakingGateway.server
+                .to(player.socketId)
+                .emit("gameStart", {
+                  matchId,
+                  gameId: game.id,
+                  opponent: currentMatch.players.find(
+                    (p) => p.socketId !== player.socketId
+                  )?.userId
+                });
             });
           } catch (error) {
-            this.logger.error(`Failed to start game for match ${matchId}:`, error);
+            this.logger.error(
+              `Failed to start game for match ${matchId}:`,
+              error
+            );
             currentMatch.players.forEach((player) => {
-              this.matchmakingGateway.server.to(player.socketId).emit("gameError", {
-                message: "Failed to start the game. Please try again."
-              });
+              this.matchmakingGateway.server
+                .to(player.socketId)
+                .emit("gameError", {
+                  message: "Failed to start the game. Please try again."
+                });
             });
           }
           this.matches.delete(matchId);
