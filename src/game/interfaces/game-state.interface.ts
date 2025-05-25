@@ -27,4 +27,21 @@ export interface GameConfig {
   initialCoins: number;
   initialCards: number;
   coinsPerRound: number;
+  turnTimeLimit: number;
+}
+
+export interface PublicGameState {
+  id: number;
+  round: number;
+  isFinished: boolean;
+  winnerId?: number;
+  loserId?: number;
+  currentPlayerIndex: number;
+  players: {
+    userId: number;
+    hp: number;
+    coins: number;
+    cardsCount: number;
+    hasPassed: boolean;
+  }[];
 } 
