@@ -29,7 +29,7 @@ export class AuthController {
 
     const expires = new Date();
     expires.setDate(expires.getDate() + 30);
-    response.cookie("jwt", jwt, {expires, httpOnly: true});
+    response.cookie("jwt", jwt, {expires, httpOnly: false});
     response.status(HttpStatus.CREATED).json({
       message: "Registration successful"
     });
@@ -43,7 +43,7 @@ export class AuthController {
 
     const expires = new Date();
     expires.setDate(expires.getDate() + 30);
-    response.cookie("jwt", jwt, {expires, httpOnly: true});
+    response.cookie("jwt", jwt, {expires, httpOnly: false});
     response.status(HttpStatus.OK).json({
       message: "Login successful"
     });
