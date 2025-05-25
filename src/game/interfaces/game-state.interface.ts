@@ -10,7 +10,7 @@ export interface PlayerState {
   hasPassed: boolean;
 }
 
-export type Card = Omit<DatabaseCard, "updatedAt" | "createdAt">
+export type Card = Omit<DatabaseCard, "updatedAt" | "createdAt">;
 
 export interface GameState {
   id: number;
