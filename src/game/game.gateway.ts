@@ -47,13 +47,13 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage("joinGame")
   async handleJoinGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: {gameId: number; userId: number}
+    @MessageBody() data: {gameId: number; username: string}
   ) {
     try {
       const gameState = await this.gamesService.joinGame(
         client.id,
         data.gameId,
-        data.userId
+        data.username
       );
       return {success: true, data: gameState};
     } catch (error) {

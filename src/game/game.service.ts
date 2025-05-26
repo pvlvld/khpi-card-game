@@ -26,8 +26,8 @@ class GameNotFoundError extends GameError {
 }
 
 class PlayerNotFoundError extends GameError {
-  constructor(userId: number) {
-    super(`Player not found: ${userId}`);
+  constructor(username: string) {
+    super(`Player not found: ${username}`);
     this.name = "PlayerNotFoundError";
   }
 }
@@ -103,6 +103,10 @@ export class GamesService {
     const prismaCards = await this.cardService.getRandomCards(
       this.gameConfig.initialCards
     );
+    const user = await this.prisma.user.findUnique({
+      where: {id: userId},
+      select: {username: true}
+    });
     const cards: Card[] = prismaCards.map((card) => ({
       id: card.id,
       name: card.name,
@@ -116,6 +120,7 @@ export class GamesService {
     return {
       userId,
       socketId: "",
+      username: user?.username || `Player_${userId}`,
       hp: this.gameConfig.initialHp,
       coins: this.gameConfig.initialCoins,
       cards,
@@ -127,16 +132,18 @@ export class GamesService {
   async joinGame(
     socketId: string,
     gameId: number,
-    userId: number
+    username: string
   ): Promise<GameState> {
     const gameState = this.activeGames.get(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
 
-    const playerIndex = gameState.players.findIndex((p) => p.userId === userId);
+    const playerIndex = gameState.players.findIndex(
+      (p) => p.username === username
+    );
     if (playerIndex === -1) {
-      throw new PlayerNotFoundError(userId);
+      throw new PlayerNotFoundError(username);
     }
 
     gameState.players[playerIndex].socketId = socketId;
@@ -293,7 +300,7 @@ export class GamesService {
       (p) => p.socketId === socketId
     );
     if (playerIndex === -1) {
-      throw new PlayerNotFoundError(gameState.players[0].userId); // Use first player as fallback
+      throw new PlayerNotFoundError(gameState.players[0].username); // Use first player as fallback
     }
 
     const player = gameState.players[playerIndex];

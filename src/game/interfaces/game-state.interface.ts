@@ -3,6 +3,7 @@ import {Card as DatabaseCard} from "generated/prisma";
 export interface PlayerState {
   socketId: string;
   userId: number;
+  username: string;
   hp: number;
   coins: number;
   cards: Card[];
