@@ -39,6 +39,7 @@ export interface PublicGameState {
   isFinished: boolean;
   winnerId?: number;
   loserId?: number;
+  currentPlayerIndex: number;
   currentPlayerUsername: string;
   players: {
     userId: number;

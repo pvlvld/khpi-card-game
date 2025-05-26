@@ -216,6 +216,7 @@ export class GamesService {
       isFinished: gameState.isFinished,
       winnerId: gameState.winnerId,
       loserId: gameState.loserId,
+      currentPlayerIndex: gameState.currentPlayerIndex,
       currentPlayerUsername: gameState.currentPlayerUsername,
       players: [
         {
