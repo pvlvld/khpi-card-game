@@ -108,6 +108,8 @@ export class UsersService {
 
     const gamesCount = user.gamesAsLoser.length + user.gamesAsWinner.length;
     const winsCount = user.gamesAsWinner.length;
+    const lossesCount = user.gamesAsLoser.length;
+    const winrate = gamesCount ? Math.round((winsCount / gamesCount) * 100) : 0;
     const games = [
       ...user.gamesAsWinner.map((game) => ({
         win: true,
@@ -124,6 +126,8 @@ export class UsersService {
       avatarUrl: user.avatarUrl,
       gamesCount,
       winsCount,
+      lossesCount,
+      winrate,
       games
     };
   }
