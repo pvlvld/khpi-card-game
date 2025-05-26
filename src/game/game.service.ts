@@ -215,8 +215,14 @@ export class GamesService {
       id: gameState.id,
       round: gameState.round,
       isFinished: gameState.isFinished,
-      winnerId: gameState.winnerId,
-      loserId: gameState.loserId,
+      winnerUsername: gameState.winnerId
+        ? gameState.players.find((p) => p.userId === gameState.winnerId)
+            ?.username || "Unknown"
+        : "None",
+      loserUsername: gameState.loserId
+        ? gameState.players.find((p) => p.userId === gameState.loserId)
+            ?.username || "Unknown"
+        : "None",
       currentPlayerIndex: gameState.currentPlayerIndex,
       currentPlayerUsername: gameState.currentPlayerUsername,
       players: [
