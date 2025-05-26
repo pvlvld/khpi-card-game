@@ -83,8 +83,6 @@ export class GamesService {
       loser: undefined
     });
 
-    console.log(game);
-
     const gameState: GameState = {
       id: game.id,
       players: await Promise.all([
