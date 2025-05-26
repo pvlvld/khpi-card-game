@@ -149,6 +149,7 @@ export class GamesService {
       throw new PlayerNotFoundError(username);
     }
 
+    // Hide the cards of the opponent
     gameState.players[playerIndex].socketId = socketId;
     return gameState;
   }
