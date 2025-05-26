@@ -1,8 +1,10 @@
-import {OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway} from "@nestjs/websockets";
-import { UseGuards } from '@nestjs/common';
+import {ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway} from "@nestjs/websockets";
+import { Logger, UseGuards } from '@nestjs/common';
 import { WsJwtGuard } from "src/auth/guards/ws-jwt.guard";
 import { JwtService } from "@nestjs/jwt";
 import { GamesService } from "./game.service";
+import { Socket } from "socket.io";
+
 
 @WebSocketGateway({
   cors: {
@@ -12,6 +14,7 @@ import { GamesService } from "./game.service";
 })
 @UseGuards(WsJwtGuard)
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(GamesGateway.name);
   constructor(
     private readonly jwtService: JwtService,
     private readonly gamesService: GamesService

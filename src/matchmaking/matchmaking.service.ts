@@ -29,15 +29,16 @@ export class MatchmakingService {
     private readonly gamesService: GamesService
   ) {}
 
-  async addToQueue(socketId: string, playerName: string) {
-    if (this.queue.some((player) => player.socketId === socketId)) {
-      return;
-    }
-
-    this.queue.push({socketId, playerName});
-    this.logger.log(`Player ${socketId} (name: ${playerName}) joined the queue`);
-    this.tryMatchPlayers();
+  async addToQueue(socketId: string, playerName: string, userId: number) {
+  if (this.queue.some((player) => player.socketId === socketId)) {
+    return;
   }
+
+  this.queue.push({ socketId, playerName, userId });
+  this.logger.log(`Player ${socketId} (name: ${playerName}) joined the queue`);
+  this.tryMatchPlayers();
+}
+
 
   async removeFromQueue(socketId: string) {
     const index = this.queue.findIndex(
