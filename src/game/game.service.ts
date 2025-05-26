@@ -296,6 +296,11 @@ export class GamesService {
       await this.endRound(gameState);
     }
 
+    // Reset pass state
+    for (const p of gameState.players) {
+      p.hasPassed = false;
+    }
+
     this.startTurnTimer(gameId);
     this.broadcastGameState(gameState);
     return gameState;
@@ -331,7 +336,7 @@ export class GamesService {
       gameState.currentPlayerUsername =
         gameState.players[gameState.currentPlayerIndex].username;
     }
-    this.clearTurnTimer(gameId);
+
     this.startTurnTimer(gameId);
     this.broadcastGameState(gameState);
     return gameState;
