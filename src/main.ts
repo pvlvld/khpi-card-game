@@ -1,8 +1,8 @@
 import {NestFactory} from "@nestjs/core";
 import {AppModule} from "./app.module";
 import * as cookieParser from "cookie-parser";
-import { NestExpressApplication } from "@nestjs/platform-express";
-import { join } from "path";
+import {NestExpressApplication} from "@nestjs/platform-express";
+import {join} from "path";
 
 const ALLOWED_CORS_ORIGINS = [
   "http://localhost",
@@ -35,8 +35,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.useStaticAssets(join(__dirname, '..', 'uploads', 'avatars'), {
-    prefix: '/avatars/',
+  app.useStaticAssets(join(__dirname, "..", "uploads", "avatars"), {
+    prefix: "/avatars/"
   });
 
   await app.listen(process.env.NEST_PORT ?? 3069);

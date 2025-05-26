@@ -1,16 +1,17 @@
 import {Injectable, Logger, Inject, forwardRef} from "@nestjs/common";
 import {MatchmakingGateway} from "./matchmaking.gateway";
+import {GamesService} from "src/game/game.service";
 
 interface QueuedPlayer {
   socketId: string;
   playerName: string;
+  userId: number;
   matchId?: string;
 }
 
 interface Match {
   id: string;
-  players: string[];
-  playerNames: string[];
+  players: QueuedPlayer[];
   startTime: number;
   cancelled: boolean;
 }
@@ -24,7 +25,8 @@ export class MatchmakingService {
 
   constructor(
     @Inject(forwardRef(() => MatchmakingGateway))
-    private readonly matchmakingGateway: MatchmakingGateway
+    private readonly matchmakingGateway: MatchmakingGateway,
+    private readonly gamesService: GamesService
   ) {}
 
   async addToQueue(socketId: string, playerName: string) {
@@ -32,8 +34,8 @@ export class MatchmakingService {
       return;
     }
 
-    this.queue.push({ socketId, playerName });
-    this.logger.log(`Player ${playerName} (${socketId}) joined the queue`);
+    this.queue.push({socketId, playerName});
+    this.logger.log(`Player ${socketId} (name: ${playerName}) joined the queue`);
     this.tryMatchPlayers();
   }
 
@@ -49,14 +51,16 @@ export class MatchmakingService {
 
   async cancelMatch(socketId: string) {
     const match = Array.from(this.matches.values()).find((match) =>
-      match.players.includes(socketId)
+      match.players.some((p) => p.socketId === socketId)
     );
 
     if (match) {
       match.cancelled = true;
-      match.players.forEach((playerId) => {
-        this.matchmakingGateway.server.to(playerId).emit("matchCancelled");
-        // this.addToQueue(playerId); // Re-add players to queue???
+      match.players.forEach((player) => {
+        this.matchmakingGateway.server
+          .to(player.socketId)
+          .emit("matchCancelled");
+        // this.addToQueue(player.socketId, player.userId); // Re-add players to queue???
       });
       this.matches.delete(match.id);
     }
@@ -75,34 +79,58 @@ export class MatchmakingService {
 
       const match: Match = {
         id: matchId,
-        players: [player1.socketId, player2.socketId],
-        playerNames: [player1.playerName, player2.playerName],
+        players: [player1, player2],
         startTime,
         cancelled: false
       };
 
       this.matches.set(matchId, match);
 
-      // Notify players, передаем имена противников
-      [player1.socketId, player2.socketId].forEach((socketId, idx) => {
-        this.matchmakingGateway.server.to(socketId).emit("matchFound", {
+      // Notify players
+      [player1, player2].forEach((player, idx) => {
+        this.matchmakingGateway.server.to(player.socketId).emit("matchFound", {
           matchId,
           startTime,
           countdown: this.COUNTDOWN_SECONDS,
-          opponentName: [player1.playerName, player2.playerName][1 - idx], // имя оппонента
+          opponentName: [player1.playerName, player2.playerName][1 - idx],
         });
       });
 
-      // Start countdown (оставляем без изменений)
-      setTimeout(() => {
+      // Start countdown
+      setTimeout(async () => {
         const currentMatch = this.matches.get(matchId);
         if (currentMatch && !currentMatch.cancelled) {
-          currentMatch.players.forEach((socketId) => {
-            this.matchmakingGateway.server.to(socketId).emit("gameStart", {
-              matchId,
-              opponent: currentMatch.players.find((p) => p !== socketId)
+          try {
+            const game = await this.gamesService.startGame(
+              currentMatch.players[0].userId,
+              currentMatch.players[1].userId
+            );
+
+            // Notify players and provide game connection info
+            currentMatch.players.forEach((player) => {
+              this.matchmakingGateway.server
+                .to(player.socketId)
+                .emit("gameStart", {
+                  matchId,
+                  gameId: game.id,
+                  opponent: currentMatch.players.find(
+                    (p) => p.socketId !== player.socketId
+                  )?.userId
+                });
             });
-          });
+          } catch (error) {
+            this.logger.error(
+              `Failed to start game for match ${matchId}:`,
+              error
+            );
+            currentMatch.players.forEach((player) => {
+              this.matchmakingGateway.server
+                .to(player.socketId)
+                .emit("gameError", {
+                  message: "Failed to start the game. Please try again."
+                });
+            });
+          }
           this.matches.delete(matchId);
         }
       }, this.COUNTDOWN_SECONDS * 1000);

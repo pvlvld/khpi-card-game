@@ -4,15 +4,15 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
-  Req,
-} from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { UsersService } from './user.service';
-import { memoryStorage } from 'multer';
-import { Request } from 'express';
-import { JwtService } from '@nestjs/jwt';
+  Req
+} from "@nestjs/common";
+import {FileInterceptor} from "@nestjs/platform-express";
+import {UsersService} from "./user.service";
+import {memoryStorage} from "multer";
+import {Request} from "express";
+import {JwtService} from "@nestjs/jwt";
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -42,11 +42,11 @@ export class UsersController {
     try {
       payload = this.jwtService.verify(token); // Throws if invalid
     } catch (e) {
-      throw new BadRequestException('Invalid JWT token');
+      throw new BadRequestException("Invalid JWT token");
     }
 
     const username = payload?.username;
-    if (!username) throw new BadRequestException('Invalid JWT payload');
+    if (!username) throw new BadRequestException("Invalid JWT payload");
 
     return this.usersService.uploadAvatarByUsername(username, file);
   }

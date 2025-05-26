@@ -3,7 +3,9 @@ import {
   WebSocketServer,
   SubscribeMessage,
   OnGatewayConnection,
-  OnGatewayDisconnect
+  OnGatewayDisconnect,
+  ConnectedSocket,
+  MessageBody
 } from "@nestjs/websockets";
 import {forwardRef, Inject} from "@nestjs/common";
 import {Server, Socket} from "socket.io";
@@ -14,7 +16,8 @@ import * as jwt from 'jsonwebtoken';
   cors: {
     origin: process.env.FRONTEND_URL,
     credentials: true,
-  }
+  },
+  namespace: "matchmaking"
 })
 export class MatchmakingGateway
   implements OnGatewayConnection, OnGatewayDisconnect
@@ -28,11 +31,11 @@ export class MatchmakingGateway
   ) {}
 
   async handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
+    console.log(`Matchmaking client connected: ${client.id}`);
   }
 
   async handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    console.log(`Matchmaking client disconnected: ${client.id}`);
     await this.matchmakingService.removeFromQueue(client.id);
   }
 
@@ -69,12 +72,12 @@ export class MatchmakingGateway
   }
 
   @SubscribeMessage("leaveQueue")
-  async handleLeaveQueue(client: Socket) {
+  async handleLeaveQueue(@ConnectedSocket() client: Socket) {
     await this.matchmakingService.removeFromQueue(client.id);
   }
 
   @SubscribeMessage("cancelMatch")
-  async handleCancelMatch(client: Socket) {
+  async handleCancelMatch(@ConnectedSocket() client: Socket) {
     await this.matchmakingService.cancelMatch(client.id);
   }
 }
