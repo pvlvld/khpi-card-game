@@ -219,6 +219,7 @@ export class GamesService {
       players: [
         {
           userId: currentPlayer.userId,
+          username: currentPlayer.username,
           hp: currentPlayer.hp,
           coins: currentPlayer.coins,
           cardsCount: currentPlayer.cards.length,
@@ -228,6 +229,7 @@ export class GamesService {
         },
         {
           userId: opponent.userId,
+          username: opponent.username,
           hp: opponent.hp,
           coins: opponent.coins,
           cardsCount: opponent.cards.length,

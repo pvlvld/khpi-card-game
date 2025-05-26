@@ -41,6 +41,7 @@ export interface PublicGameState {
   currentPlayerUsername: string;
   players: {
     userId: number;
+    username: string;
     hp: number;
     coins: number;
     cardsCount: number;
