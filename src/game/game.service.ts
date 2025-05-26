@@ -83,13 +83,16 @@ export class GamesService {
       loser: undefined
     });
 
+    const players = await Promise.all([
+      this.initializePlayerState(player1Id),
+      this.initializePlayerState(player2Id)
+    ]);
+    const currentPlayerIndex = Math.random() < 0.5 ? 0 : 1;
     const gameState: GameState = {
       id: game.id,
-      players: await Promise.all([
-        this.initializePlayerState(player1Id),
-        this.initializePlayerState(player2Id)
-      ]),
-      currentPlayerIndex: Math.random() < 0.5 ? 0 : 1,
+      players: players,
+      currentPlayerIndex,
+      currentPlayerUsername: players[currentPlayerIndex].username,
       round: 1,
       isFinished: false
     };
@@ -212,7 +215,7 @@ export class GamesService {
       isFinished: gameState.isFinished,
       winnerId: gameState.winnerId,
       loserId: gameState.loserId,
-      currentPlayerIndex: gameState.currentPlayerIndex,
+      currentPlayerUsername: gameState.currentPlayerUsername,
       players: [
         {
           userId: currentPlayer.userId,
@@ -361,6 +364,8 @@ export class GamesService {
     // Start new round
     gameState.round++;
     gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex; // Switch starting player
+    gameState.currentPlayerUsername =
+      gameState.players[gameState.currentPlayerIndex].username;
 
     // Reset round state
     for (const player of gameState.players) {
