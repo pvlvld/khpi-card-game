@@ -4,6 +4,7 @@ import {GamesService} from "src/game/game.service";
 
 interface QueuedPlayer {
   socketId: string;
+  playerName: string;
   userId: number;
   matchId?: string;
 }
@@ -28,14 +29,13 @@ export class MatchmakingService {
     private readonly gamesService: GamesService
   ) {}
 
-  // TODO: replace userId with JWT cookie for authorization
-  async addToQueue(socketId: string, userId: number) {
+  async addToQueue(socketId: string, playerName: string) {
     if (this.queue.some((player) => player.socketId === socketId)) {
       return;
     }
 
-    this.queue.push({socketId, userId});
-    this.logger.log(`Player ${socketId} (userId: ${userId}) joined the queue`);
+    this.queue.push({socketId, playerName});
+    this.logger.log(`Player ${socketId} (name: ${playerName}) joined the queue`);
     this.tryMatchPlayers();
   }
 
@@ -87,11 +87,12 @@ export class MatchmakingService {
       this.matches.set(matchId, match);
 
       // Notify players
-      [player1, player2].forEach((player) => {
+      [player1, player2].forEach((player, idx) => {
         this.matchmakingGateway.server.to(player.socketId).emit("matchFound", {
           matchId,
           startTime,
-          countdown: this.COUNTDOWN_SECONDS
+          countdown: this.COUNTDOWN_SECONDS,
+          opponentName: [player1.playerName, player2.playerName][1 - idx],
         });
       });
 
@@ -135,4 +136,5 @@ export class MatchmakingService {
       }, this.COUNTDOWN_SECONDS * 1000);
     }
   }
+
 }
