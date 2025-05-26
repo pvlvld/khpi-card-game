@@ -314,6 +314,11 @@ export class GamesService {
     }
 
     const player = gameState.players[playerIndex];
+
+    if (player.hasPassed) {
+      throw new GameError("You have already passed this round.");
+    }
+
     player.hasPassed = true;
 
     // If other player has passed, end the round
