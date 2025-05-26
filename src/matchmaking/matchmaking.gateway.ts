@@ -57,7 +57,7 @@ export class MatchmakingGateway
       return;
     }
 
-    let payload;
+    let payload: { username?: string };
     try {
       payload = jwt.decode(token) as { username?: string };
     } catch (e) {
