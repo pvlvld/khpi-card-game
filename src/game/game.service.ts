@@ -61,9 +61,9 @@ export class GamesService {
   private server?: Server;
   private readonly gameConfig: GameConfig = {
     initialHp: 30,
-    initialCoins: 3,
+    initialCoins: 20,
     initialCards: 4,
-    coinsPerRound: 2,
+    coinsPerRound: 5,
     turnTimeLimit: 30
   };
 
