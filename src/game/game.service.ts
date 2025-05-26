@@ -53,10 +53,11 @@ class NotEnoughCoinsError extends GameError {
   }
 }
 
+const _activeGames: Map<number, GameState> = new Map()
 @Injectable()
 export class GamesService {
   private readonly logger = new Logger(GamesService.name);
-  private readonly activeGames: Map<number, GameState> = new Map();
+  private readonly activeGames = _activeGames;
   private readonly turnTimers: Map<number, NodeJS.Timeout> = new Map();
   private server?: Server;
   private readonly gameConfig: GameConfig = {
