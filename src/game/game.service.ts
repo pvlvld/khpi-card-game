@@ -373,7 +373,7 @@ export class GamesService {
     gameState.round++;
     gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex; // Switch starting player
     gameState.currentPlayerUsername =
-      gameState.players[1 - gameState.currentPlayerIndex].username;
+      gameState.players[gameState.currentPlayerIndex].username;
 
     // Reset round state
     for (const player of gameState.players) {
