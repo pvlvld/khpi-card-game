@@ -100,13 +100,13 @@ export class GamesService {
   }
 
   private async initializePlayerState(userId: number): Promise<PlayerState> {
-    const prismaCards = await this.cardService.getRandomCards(
-      this.gameConfig.initialCards
-    );
-    const user = await this.prisma.user.findUnique({
-      where: {id: userId},
-      select: {username: true}
-    });
+    const [prismaCards, user] = await Promise.all([
+      this.cardService.getRandomCards(this.gameConfig.initialCards),
+      this.prisma.user.findUnique({
+        where: {id: userId},
+        select: {username: true}
+      })
+    ]);
     const cards: Card[] = prismaCards.map((card) => ({
       id: card.id,
       name: card.name,
