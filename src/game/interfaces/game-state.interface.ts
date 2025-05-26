@@ -14,6 +14,10 @@ export interface PlayerState {
 
 export type Card = Omit<DatabaseCard, "updatedAt" | "createdAt">;
 
+export interface GameStateWithSettings extends GameState {
+  gameSettings: GameConfig;
+}
+
 export interface GameState {
   id: number;
   players: [PlayerState, PlayerState];

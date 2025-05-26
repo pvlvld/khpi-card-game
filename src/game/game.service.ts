@@ -7,7 +7,8 @@ import {
   PlayerState,
   GameConfig,
   Card,
-  PublicGameState
+  PublicGameState,
+  GameStateWithSettings
 } from "./interfaces/game-state.interface";
 import {Server} from "socket.io";
 import {GameStateService} from "./game-state.service";
@@ -88,13 +89,20 @@ export class GamesService {
       this.initializePlayerState(player2Id)
     ]);
     const currentPlayerIndex = Math.random() < 0.5 ? 0 : 1;
-    const gameState: GameState = {
+    const gameState: GameStateWithSettings = {
       id: game.id,
       players: players,
       currentPlayerIndex,
       currentPlayerUsername: players[currentPlayerIndex].username,
       round: 1,
-      isFinished: false
+      isFinished: false,
+      gameSettings: {
+        initialHp: this.gameConfig.initialHp,
+        initialCoins: this.gameConfig.initialCoins,
+        initialCards: this.gameConfig.initialCards,
+        coinsPerRound: this.gameConfig.coinsPerRound,
+        turnTimeLimit: this.gameConfig.turnTimeLimit
+      }
     };
 
     this.gameStateService.setGame(game.id, gameState);
