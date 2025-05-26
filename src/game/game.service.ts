@@ -364,6 +364,10 @@ export class GamesService {
         Math.max(0, damage2 - this.calculateDefence(player1.playedCards))
     );
 
+    // Reset pass state
+    player1.hasPassed = false;
+    player2.hasPassed = false;
+
     // Check for game end
     if (player1.hp === 0 || player2.hp === 0) {
       await this.endGame(
