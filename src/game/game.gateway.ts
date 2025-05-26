@@ -16,7 +16,8 @@ import {Socket} from "socket.io";
   cors: {
     origin: process.env.FRONTEND_URL,
     credentials: true
-  }
+  },
+  namespace: "game"
 })
 @UseGuards(WsJwtGuard)
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
