@@ -60,11 +60,11 @@ export class GamesService {
   private readonly turnTimers: Map<number, NodeJS.Timeout> = new Map();
   private server?: Server;
   private readonly gameConfig: GameConfig = {
-    initialHp: 30,
+    initialHp: 20,
     initialCoins: 20,
     initialCards: 4,
-    coinsPerRound: 5,
-    turnTimeLimit: 30
+    coinsPerRound: 8,
+    turnTimeLimit: 20
   };
 
   constructor(
