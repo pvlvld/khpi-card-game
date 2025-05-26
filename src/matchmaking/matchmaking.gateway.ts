@@ -11,6 +11,7 @@ import {forwardRef, Inject} from "@nestjs/common";
 import {Server, Socket} from "socket.io";
 import {MatchmakingService} from "./matchmaking.service";
 import * as jwt from 'jsonwebtoken';
+import { UsersService } from "src/user/user.service";
 
 @WebSocketGateway({
   cors: {
@@ -27,7 +28,8 @@ export class MatchmakingGateway
 
   constructor(
     @Inject(forwardRef(() => MatchmakingService))
-    private readonly matchmakingService: MatchmakingService
+    private readonly matchmakingService: MatchmakingService,
+    private readonly usersService: UsersService
   ) {}
 
   async handleConnection(client: Socket) {
@@ -68,7 +70,14 @@ export class MatchmakingGateway
       return;
     }
 
-    await this.matchmakingService.addToQueue(client.id, payload.username);
+    const user = await this.usersService.findOne({ username: payload.username });
+
+    if (!user) {
+      client.emit('error', 'User not found');
+      return;
+    }
+
+    await this.matchmakingService.addToQueue(client.id, user.username, user.id);
   }
 
   @SubscribeMessage("leaveQueue")

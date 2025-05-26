@@ -5,9 +5,10 @@ import {GamesModule} from "src/game/game.module";
 import {GamesService} from "src/game/game.service";
 import {PrismaService} from "src/prisma/prisma.service";
 import {CardModule} from "src/card/card.module";
+import { UsersModule } from "src/user/user.module";
 
 @Module({
-  imports: [GamesModule, CardModule],
+  imports: [GamesModule, CardModule, UsersModule],
   providers: [
     MatchmakingService,
     MatchmakingGateway,
