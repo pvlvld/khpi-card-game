@@ -7,6 +7,7 @@ export interface PlayerState {
   hp: number;
   coins: number;
   cards: Card[];
+  cardsCount: number;
   playedCards: Card[];
   hasPassed: boolean;
 }

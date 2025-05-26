@@ -126,6 +126,7 @@ export class GamesService {
       hp: this.gameConfig.initialHp,
       coins: this.gameConfig.initialCoins,
       cards,
+      cardsCount: cards.length,
       playedCards: [],
       hasPassed: false
     };
