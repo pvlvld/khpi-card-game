@@ -322,6 +322,8 @@ export class GamesService {
     } else {
       // Switch turns
       gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex;
+      gameState.currentPlayerUsername =
+        gameState.players[gameState.currentPlayerIndex].username;
     }
 
     this.startTurnTimer(gameId);
