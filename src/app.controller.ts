@@ -16,7 +16,7 @@ export class AppController {
 
   @Get("user/:username")
   async getUser(@Param("username") username: string) {
-    const user = await this.userService.findOne({username});
-    return JSON.stringify(user);
+    const userInfo = await this.userService.getUserInfo(username);
+    return JSON.stringify(userInfo);
   }
 }

@@ -84,4 +84,47 @@ export class UsersService {
 
     return this.uploadAvatar(user.id, file);
   }
+
+  async getUserInfo(username: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {username},
+      include: {
+        gamesAsLoser: {
+          select: {
+            createdAt: true
+          }
+        },
+        gamesAsWinner: {
+          select: {
+            createdAt: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      throw new BadRequestException("User not found");
+    }
+
+    const gamesCount = user.gamesAsLoser.length + user.gamesAsWinner.length;
+    const winsCount = user.gamesAsWinner.length;
+    const games = [
+      ...user.gamesAsWinner.map((game) => ({
+        win: true,
+        date: game.createdAt
+      })),
+      ...user.gamesAsLoser.map((game) => ({
+        win: false,
+        date: game.createdAt
+      }))
+    ].sort((a, b) => b.date.getTime() - a.date.getTime()); // DESC
+
+    return {
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      gamesCount,
+      winsCount,
+      games
+    };
+  }
 }
