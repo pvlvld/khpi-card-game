@@ -86,10 +86,10 @@ export class GamesService {
 
     const gameState: GameState = {
       id: game.id,
-      players: [
-        await this.initializePlayerState(player1Id),
-        await this.initializePlayerState(player2Id)
-      ],
+      players: await Promise.all([
+        this.initializePlayerState(player1Id),
+        this.initializePlayerState(player2Id)
+      ]),
       currentPlayerIndex: Math.random() < 0.5 ? 0 : 1,
       round: 1,
       isFinished: false
