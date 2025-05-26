@@ -3,6 +3,7 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
@@ -10,7 +11,7 @@ import {Logger, UseGuards} from "@nestjs/common";
 import {WsJwtGuard} from "src/auth/guards/ws-jwt.guard";
 import {JwtService} from "@nestjs/jwt";
 import {GamesService} from "./game.service";
-import {Socket} from "socket.io";
+import {Socket, Server} from "socket.io";
 
 @WebSocketGateway({
   cors: {
@@ -20,12 +21,16 @@ import {Socket} from "socket.io";
   namespace: "game"
 })
 @UseGuards(WsJwtGuard)
-export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
   private readonly logger = new Logger(GamesGateway.name);
   constructor(
     private readonly jwtService: JwtService,
     private readonly gamesService: GamesService
   ) {}
+
+  afterInit(server: Server) {
+    this.gamesService.setServer(server);
+  }
 
   @SubscribeMessage("message")
   handleMessage(client: any, payload: any): string {
