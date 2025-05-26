@@ -30,15 +30,16 @@ export class MatchmakingService {
   ) {}
 
   async addToQueue(socketId: string, playerName: string, userId: number) {
-  if (this.queue.some((player) => player.socketId === socketId)) {
-    return;
+    if (this.queue.some((player) => player.socketId === socketId)) {
+      return;
+    }
+
+    this.queue.push({socketId, playerName, userId});
+    this.logger.log(
+      `Player ${socketId} (name: ${playerName}) joined the queue`
+    );
+    this.tryMatchPlayers();
   }
-
-  this.queue.push({ socketId, playerName, userId });
-  this.logger.log(`Player ${socketId} (name: ${playerName}) joined the queue`);
-  this.tryMatchPlayers();
-}
-
 
   async removeFromQueue(socketId: string) {
     const index = this.queue.findIndex(
@@ -93,7 +94,7 @@ export class MatchmakingService {
           matchId,
           startTime,
           countdown: this.COUNTDOWN_SECONDS,
-          opponentName: [player1.playerName, player2.playerName][1 - idx],
+          opponentName: [player1.playerName, player2.playerName][1 - idx]
         });
       });
 
@@ -137,5 +138,4 @@ export class MatchmakingService {
       }, this.COUNTDOWN_SECONDS * 1000);
     }
   }
-
 }

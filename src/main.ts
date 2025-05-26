@@ -9,7 +9,7 @@ const ALLOWED_CORS_ORIGINS = [
   "http://127.0.0.1",
   "https://localhost",
   "https://127.0.0.1",
-  `${process.env.FRONTEND_URL}`,
+  `${process.env.FRONTEND_URL}`
 ];
 
 async function bootstrap() {

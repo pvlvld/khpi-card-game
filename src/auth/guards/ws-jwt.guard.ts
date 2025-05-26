@@ -1,6 +1,6 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { WsException } from '@nestjs/websockets';
+import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
+import {JwtService} from "@nestjs/jwt";
+import {WsException} from "@nestjs/websockets";
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
@@ -9,34 +9,34 @@ export class WsJwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient();
     const cookies = client.handshake.headers.cookie;
-    
+
     if (!cookies) {
-      throw new WsException('Missing cookies');
+      throw new WsException("Missing cookies");
     }
 
     const token = this.extractTokenFromCookies(cookies);
     if (!token) {
-      throw new WsException('Missing JWT token');
+      throw new WsException("Missing JWT token");
     }
 
     try {
       const payload = this.jwtService.verify(token);
       if (!payload?.username) {
-        throw new WsException('Invalid JWT payload');
+        throw new WsException("Invalid JWT payload");
       }
-      
+
       client.data.user = payload;
       return true;
     } catch (e) {
-      throw new WsException('Invalid JWT token');
+      throw new WsException("Invalid JWT token");
     }
   }
 
   private extractTokenFromCookies(cookies: string): string | null {
-    const cookieArray = cookies.split(';');
+    const cookieArray = cookies.split(";");
     for (const cookie of cookieArray) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'jwt') {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "jwt") {
         return value;
       }
     }

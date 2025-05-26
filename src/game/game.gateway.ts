@@ -1,16 +1,22 @@
-import {ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway} from "@nestjs/websockets";
-import { Logger, UseGuards } from '@nestjs/common';
-import { WsJwtGuard } from "src/auth/guards/ws-jwt.guard";
-import { JwtService } from "@nestjs/jwt";
-import { GamesService } from "./game.service";
-import { Socket } from "socket.io";
-
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway
+} from "@nestjs/websockets";
+import {Logger, UseGuards} from "@nestjs/common";
+import {WsJwtGuard} from "src/auth/guards/ws-jwt.guard";
+import {JwtService} from "@nestjs/jwt";
+import {GamesService} from "./game.service";
+import {Socket} from "socket.io";
 
 @WebSocketGateway({
   cors: {
     origin: process.env.FRONTEND_URL,
-    credentials: true,
-  },
+    credentials: true
+  }
 })
 @UseGuards(WsJwtGuard)
 export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -20,12 +26,11 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly gamesService: GamesService
   ) {}
 
-
   @SubscribeMessage("message")
   handleMessage(client: any, payload: any): string {
     return "Hello world!";
   }
- 
+
   async handleConnection(client: Socket) {
     this.logger.log(`Game client connected: ${client.id}`);
   }
@@ -95,4 +100,3 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 }
-
