@@ -56,6 +56,9 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect {
         data.gameId,
         data.username
       );
+      this.logger.log(
+        `Player ${data.username} joined game ${data.gameId} with socket ${client.id}`
+      );
       return {success: true, data: gameState};
     } catch (error) {
       this.logger.error(`Error joining game: ${error.message}`);

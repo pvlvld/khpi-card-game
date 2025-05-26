@@ -10,6 +10,7 @@ import {
   PublicGameState
 } from "./interfaces/game-state.interface";
 import {Server} from "socket.io";
+import {GameStateService} from "./game-state.service";
 
 class GameError extends Error {
   constructor(message: string) {
@@ -53,11 +54,9 @@ class NotEnoughCoinsError extends GameError {
   }
 }
 
-const _activeGames: Map<number, GameState> = new Map()
 @Injectable()
 export class GamesService {
   private readonly logger = new Logger(GamesService.name);
-  private readonly activeGames = _activeGames;
   private readonly turnTimers: Map<number, NodeJS.Timeout> = new Map();
   private server?: Server;
   private readonly gameConfig: GameConfig = {
@@ -70,7 +69,8 @@ export class GamesService {
 
   constructor(
     private prisma: PrismaService,
-    private cardService: CardService
+    private cardService: CardService,
+    private gameStateService: GameStateService
   ) {}
 
   setServer(server: Server) {
@@ -96,7 +96,7 @@ export class GamesService {
       isFinished: false
     };
 
-    this.activeGames.set(game.id, gameState);
+    this.gameStateService.setGame(game.id, gameState);
     return game;
   }
 
@@ -135,7 +135,7 @@ export class GamesService {
     gameId: number,
     username: string
   ): Promise<GameState> {
-    const gameState = this.activeGames.get(gameId);
+    const gameState = this.gameStateService.getGame(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
@@ -152,7 +152,9 @@ export class GamesService {
   }
 
   async handlePlayerDisconnect(socketId: string) {
-    for (const [gameId, gameState] of this.activeGames.entries()) {
+    for (const [gameId, gameState] of this.gameStateService
+      .getAllGames()
+      .entries()) {
       const playerIndex = gameState.players.findIndex(
         (p) => p.socketId === socketId
       );
@@ -171,11 +173,11 @@ export class GamesService {
   private startTurnTimer(gameId: number) {
     this.clearTurnTimer(gameId);
 
-    const gameState = this.activeGames.get(gameId);
+    const gameState = this.gameStateService.getGame(gameId);
     if (!gameState || gameState.isFinished) return;
 
     const timer = setTimeout(async () => {
-      const currentGameState = this.activeGames.get(gameId);
+      const currentGameState = this.gameStateService.getGame(gameId);
       if (!currentGameState || currentGameState.isFinished) return;
 
       const currentPlayer =
@@ -250,7 +252,7 @@ export class GamesService {
     gameId: number,
     cardId: number
   ): Promise<GameState> {
-    const gameState = this.activeGames.get(gameId);
+    const gameState = this.gameStateService.getGame(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
@@ -292,7 +294,7 @@ export class GamesService {
   }
 
   async passRound(socketId: string, gameId: number): Promise<GameState> {
-    const gameState = this.activeGames.get(gameId);
+    const gameState = this.gameStateService.getGame(gameId);
     if (!gameState) {
       throw new GameNotFoundError(gameId);
     }
@@ -397,7 +399,7 @@ export class GamesService {
 
   private async endGame(gameId: number, winnerId: number, loserId: number) {
     this.clearTurnTimer(gameId);
-    const gameState = this.activeGames.get(gameId);
+    const gameState = this.gameStateService.getGame(gameId);
     if (!gameState) return;
 
     // Update game in DB
@@ -412,7 +414,7 @@ export class GamesService {
     gameState.isFinished = true;
     gameState.winnerId = winnerId;
     gameState.loserId = loserId;
-    this.activeGames.delete(gameId);
+    this.gameStateService.deleteGame(gameId);
     this.broadcastGameState(gameState);
   }
 
