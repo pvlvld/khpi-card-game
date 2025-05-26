@@ -331,7 +331,7 @@ export class GamesService {
       gameState.currentPlayerUsername =
         gameState.players[gameState.currentPlayerIndex].username;
     }
-
+    this.clearTurnTimer(gameId);
     this.startTurnTimer(gameId);
     this.broadcastGameState(gameState);
     return gameState;
