@@ -287,6 +287,8 @@ export class GamesService {
 
     // Switch turns
     gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex;
+    gameState.currentPlayerUsername =
+      gameState.players[gameState.currentPlayerIndex].username;
 
     // Check if round should end
     if (this.shouldEndRound(gameState)) {
