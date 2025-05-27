@@ -367,29 +367,50 @@ export class GamesService {
 
   private async endRound(gameState: GameState) {
     this.clearTurnTimer(gameState.id);
-    // Calculate damage
     const [player1, player2] = gameState.players;
+
     const damage1 = this.calculateDamage(player1.playedCards);
     const damage2 = this.calculateDamage(player2.playedCards);
 
-    // Apply damage
-    player2.hp = Math.max(
-      0,
-      player2.hp -
-        Math.max(0, damage1 - this.calculateDefence(player2.playedCards))
-    );
-    player1.hp = Math.max(
-      0,
-      player1.hp -
-        Math.max(0, damage2 - this.calculateDefence(player1.playedCards))
-    );
+    const defence1 = this.calculateDefence(player1.playedCards);
+    const defence2 = this.calculateDefence(player2.playedCards);
+
+    const finalDamageToP2 = Math.max(0, damage1 - defence2);
+    const finalDamageToP1 = Math.max(0, damage2 - defence1);
+
+    player2.hp = Math.max(0, player2.hp - finalDamageToP2);
+    player1.hp = Math.max(0, player1.hp - finalDamageToP1);
 
     // Reset pass state
     player1.hasPassed = false;
     player2.hasPassed = false;
 
     // Check for game end
-    if (player1.hp === 0 || player2.hp === 0) {
+    const bothDead = player1.hp === 0 && player2.hp === 0;
+    const oneAlive = player1.hp === 0 || player2.hp === 0;
+
+    if (bothDead) {
+      // Tie-breaker logic
+      if (finalDamageToP2 > finalDamageToP1) {
+        await this.endGame(gameState.id, player1.userId, player2.userId);
+      } else if (finalDamageToP1 > finalDamageToP2) {
+        await this.endGame(gameState.id, player2.userId, player1.userId);
+      } else {
+        // Damage equal, fallback to coins
+        if (player1.coins > player2.coins) {
+          await this.endGame(gameState.id, player1.userId, player2.userId);
+        } else if (player2.coins > player1.coins) {
+          await this.endGame(gameState.id, player2.userId, player1.userId);
+        } else {
+          // Full draw logic (optional): either declare a draw or choose randomly
+          // For now, random:
+          const winner = Math.random() < 0.5 ? player1 : player2;
+          const loser = winner === player1 ? player2 : player1;
+          await this.endGame(gameState.id, winner.userId, loser.userId);
+        }
+      }
+      return;
+    } else if (oneAlive) {
       await this.endGame(
         gameState.id,
         player1.hp > 0 ? player1.userId : player2.userId,
@@ -398,18 +419,17 @@ export class GamesService {
       return;
     }
 
-    // Start new round
+    // Continue game
     gameState.round++;
-    gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex; // Switch starting player
+    gameState.currentPlayerIndex = 1 - gameState.currentPlayerIndex;
     gameState.currentPlayerUsername =
       gameState.players[gameState.currentPlayerIndex].username;
 
-    // Reset round state
     for (const player of gameState.players) {
       player.coins += this.gameConfig.coinsPerRound;
       player.hasPassed = false;
       player.playedCards = [];
-      // Draw new cards
+
       const prismaCards = await this.cardService.getRandomCards(
         this.gameConfig.initialCards - player.cards.length
       );
@@ -422,12 +442,14 @@ export class GamesService {
         damage: card.damage,
         defence: card.defence
       }));
+
       player.cards.push(...newCards);
     }
 
     this.startTurnTimer(gameState.id);
     this.broadcastGameState(gameState);
   }
+
 
   private calculateDamage(cards: Card[]): number {
     return cards.reduce((sum, card) => sum + card.damage, 0);
