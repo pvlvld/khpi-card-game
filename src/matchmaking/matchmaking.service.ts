@@ -71,9 +71,16 @@ export class MatchmakingService {
   private async tryMatchPlayers() {
     while (this.queue.length >= 2) {
       const player1 = this.queue.shift();
-      const player2 = this.queue.shift();
+      let player2Index = this.queue.findIndex(
+        (p) => p.userId !== player1?.userId
+      );
 
-      if (!player1 || !player2) continue;
+      if (player2Index === -1 || !player1) {
+        if (player1) this.queue.unshift(player1);
+        break;
+      }
+
+      const [player2] = this.queue.splice(player2Index, 1);
 
       const dateNow = Date.now();
       const matchId = `match_${dateNow}`;
