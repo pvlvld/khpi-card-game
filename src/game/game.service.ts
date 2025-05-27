@@ -360,7 +360,7 @@ export class GamesService {
     const [player1, player2] = gameState.players;
     return (
       (player1.hasPassed && player2.hasPassed) || // Both passed
-      (player1.cards.length === 0 && player2.cards.length === 0) || // Both have no cards
+      // (player1.cards.length === 0 && player2.cards.length === 0) || // Both have no cards
       (player1.coins === 0 && player2.coins === 0) // Both poor af
     );
   }
