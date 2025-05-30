@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://drive.google.com/drive-viewer/AKGpihZuL_eTC4LeL_hz2ksHCY0kvM-5J0vWXiuYifx75wUdal_Kh0QWZ90xZJL5WXTsorhAhRM3CtgFFe7GPwEqw7ytM4SVaO3p8Q=w1106-h929-rw-v1?auditContext=forDisplay" width="120" alt="AceHole logo" />
+![AceHole-logo](https://github.com/user-attachments/assets/0fc9f8d3-56bd-4bd0-9ff5-895e0b7fbbf4)
 </p>
 
 ## Description
