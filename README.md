@@ -1,5 +1,5 @@
 <p align="center">
-![AceHole-logo](https://github.com/user-attachments/assets/0fc9f8d3-56bd-4bd0-9ff5-895e0b7fbbf4)
+<img src="https://github.com/pvlvld/khpi-card-game/blob/main/assets/AceHole-logo.png"</img>
 </p>
 
 ## Description
