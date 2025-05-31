@@ -32,8 +32,7 @@ $ cd frontend && npm i && cd ..
 ## Compile and run the project
 
 ```bash
-$ docker-compose up
-$ cd backend && npx prisma db push && npm run start:prod && cd ..
+$ cd backend && docker-compose up -d && npx prisma db push && npm run start:prod && cd ..
 $ cd frontend && npm run dev && cd ..
 ```
 > open localhost:PORT
