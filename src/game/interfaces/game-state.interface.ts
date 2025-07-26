@@ -1,4 +1,4 @@
-import {Card as DatabaseCard} from "generated/prisma";
+import { Card as DatabaseCard } from "generated/prisma";
 
 export interface PlayerState {
   socketId: string;

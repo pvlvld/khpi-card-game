@@ -1,6 +1,6 @@
-import {Injectable, Logger, Inject, forwardRef} from "@nestjs/common";
-import {MatchmakingGateway} from "./matchmaking.gateway";
-import {GamesService} from "src/game/game.service";
+import { Injectable, Logger, Inject, forwardRef } from "@nestjs/common";
+import { MatchmakingGateway } from "./matchmaking.gateway";
+import { GamesService } from "src/game/game.service";
 
 interface QueuedPlayer {
   socketId: string;
@@ -34,7 +34,7 @@ export class MatchmakingService {
       return;
     }
 
-    this.queue.push({socketId, playerName, userId});
+    this.queue.push({ socketId, playerName, userId });
     this.logger.log(
       `Player ${socketId} (name: ${playerName}) joined the queue`
     );

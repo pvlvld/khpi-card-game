@@ -1,6 +1,6 @@
-import {Injectable} from "@nestjs/common";
-import {Card, Prisma} from "generated/prisma";
-import {PrismaService} from "src/prisma/prisma.service";
+import { Injectable } from "@nestjs/common";
+import { Card, Prisma } from "generated/prisma";
+import { PrismaService } from "src/prisma/prisma.service";
 
 // TODO: move to DB
 const _allCards: Card[] = [
@@ -239,7 +239,7 @@ export class CardService {
   }
 
   async createCard(data: Prisma.CardCreateInput): Promise<Card> {
-    return await this.prisma.card.create({data}).then((card) => {
+    return await this.prisma.card.create({ data }).then((card) => {
       this._cardCount++;
       return card;
     });
@@ -275,7 +275,7 @@ export class CardService {
     where: Prisma.CardWhereUniqueInput,
     data: Prisma.CardUpdateInput
   ): Promise<Card> {
-    return await this.prisma.card.update({where, data});
+    return await this.prisma.card.update({ where, data });
   }
 
   async deleteCard(where: Prisma.CardWhereUniqueInput): Promise<Card> {

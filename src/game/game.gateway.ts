@@ -7,11 +7,11 @@ import {
   SubscribeMessage,
   WebSocketGateway
 } from "@nestjs/websockets";
-import {Logger, UseGuards} from "@nestjs/common";
-import {WsJwtGuard} from "src/auth/guards/ws-jwt.guard";
-import {JwtService} from "@nestjs/jwt";
-import {GamesService} from "./game.service";
-import {Socket, Server} from "socket.io";
+import { Logger, UseGuards } from "@nestjs/common";
+import { WsJwtGuard } from "src/auth/guards/ws-jwt.guard";
+import { JwtService } from "@nestjs/jwt";
+import { GamesService } from "./game.service";
+import { Socket, Server } from "socket.io";
 
 @WebSocketGateway({
   cors: {
@@ -21,7 +21,9 @@ import {Socket, Server} from "socket.io";
   namespace: "game"
 })
 @UseGuards(WsJwtGuard)
-export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+export class GamesGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   private readonly logger = new Logger(GamesGateway.name);
   constructor(
     private readonly jwtService: JwtService,
@@ -53,7 +55,7 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect, O
   @SubscribeMessage("joinGame")
   async handleJoinGame(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: {gameId: number; username: string}
+    @MessageBody() data: { gameId: number; username: string }
   ) {
     try {
       const gameState = await this.gamesService.joinGame(
@@ -64,18 +66,18 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect, O
       this.logger.log(
         `Player ${data.username} joined game ${data.gameId} with socket ${client.id}`
       );
-      return {success: true, data: gameState};
+      return { success: true, data: gameState };
     } catch (error) {
       this.logger.error(`Error joining game: ${error.message}`);
-      client.emit("error", {message: error.message});
-      return {success: false, error: error.message};
+      client.emit("error", { message: error.message });
+      return { success: false, error: error.message };
     }
   }
 
   @SubscribeMessage("playCard")
   async handlePlayCard(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: {gameId: number; cardId: number}
+    @MessageBody() data: { gameId: number; cardId: number }
   ) {
     try {
       const gameState = await this.gamesService.playCard(
@@ -83,29 +85,29 @@ export class GamesGateway implements OnGatewayConnection, OnGatewayDisconnect, O
         data.gameId,
         data.cardId
       );
-      return {success: true, data: gameState};
+      return { success: true, data: gameState };
     } catch (error) {
       this.logger.error(`Error playing card: ${error.message}`);
-      client.emit("error", {message: error.message});
-      return {success: false, error: error.message};
+      client.emit("error", { message: error.message });
+      return { success: false, error: error.message };
     }
   }
 
   @SubscribeMessage("passRound")
   async handlePassRound(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: {gameId: number}
+    @MessageBody() data: { gameId: number }
   ) {
     try {
       const gameState = await this.gamesService.passRound(
         client.id,
         data.gameId
       );
-      return {success: true, data: gameState};
+      return { success: true, data: gameState };
     } catch (error) {
       this.logger.error(`Error passing round: ${error.message}`);
-      client.emit("error", {message: error.message});
-      return {success: false, error: error.message};
+      client.emit("error", { message: error.message });
+      return { success: false, error: error.message };
     }
   }
 }

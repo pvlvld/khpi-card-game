@@ -3,11 +3,11 @@ import {
   UnauthorizedException,
   ConflictException
 } from "@nestjs/common";
-import {JwtService} from "@nestjs/jwt";
+import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "@node-rs/argon2";
-import {Account} from "generated/prisma";
-import {AccountService} from "src/account/account.service";
-import {PrismaService} from "src/prisma/prisma.service";
+import { Account } from "generated/prisma";
+import { AccountService } from "src/account/account.service";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
       throw new UnauthorizedException("Username and password are required");
     }
 
-    const existingUser = await this.accountService.findUnique({username});
+    const existingUser = await this.accountService.findUnique({ username });
     if (existingUser) {
       throw new ConflictException("Username already exists");
     }
@@ -47,10 +47,10 @@ export class AuthService {
         }
       });
 
-      return {user, account};
+      return { user, account };
     });
 
-    return this.jwtService.signAsync({sub: result.account.id, username});
+    return this.jwtService.signAsync({ sub: result.account.id, username });
   }
 
   // TODO: OAuth
@@ -59,7 +59,7 @@ export class AuthService {
       throw new UnauthorizedException("Username and password are required");
     }
 
-    const account = await this.accountService.findUnique({username});
+    const account = await this.accountService.findUnique({ username });
 
     return await this.login(account!);
   }
@@ -68,7 +68,7 @@ export class AuthService {
     username: string,
     password: string
   ): Promise<Account | null> {
-    const account = await this.accountService.findUnique({username});
+    const account = await this.accountService.findUnique({ username });
 
     if (
       !account?.passwordHash ||

@@ -1,7 +1,7 @@
-import {Injectable, Logger} from "@nestjs/common";
-import {Game, Prisma, Card as PrismaCard} from "generated/prisma";
-import {PrismaService} from "src/prisma/prisma.service";
-import {CardService} from "src/card/card.service";
+import { Injectable, Logger } from "@nestjs/common";
+import { Game, Prisma, Card as PrismaCard } from "generated/prisma";
+import { PrismaService } from "src/prisma/prisma.service";
+import { CardService } from "src/card/card.service";
 import {
   GameState,
   PlayerState,
@@ -10,8 +10,8 @@ import {
   PublicGameState,
   GameStateWithSettings
 } from "./interfaces/game-state.interface";
-import {Server} from "socket.io";
-import {GameStateService} from "./game-state.service";
+import { Server } from "socket.io";
+import { GameStateService } from "./game-state.service";
 
 class GameError extends Error {
   constructor(message: string) {
@@ -113,8 +113,8 @@ export class GamesService {
     const [prismaCards, user] = await Promise.all([
       this.cardService.getRandomCards(this.gameConfig.initialCards),
       this.prisma.user.findUnique({
-        where: {id: userId},
-        select: {username: true}
+        where: { id: userId },
+        select: { username: true }
       })
     ]);
     const cards: Card[] = prismaCards.map((card) => ({
@@ -450,7 +450,6 @@ export class GamesService {
     this.broadcastGameState(gameState);
   }
 
-
   private calculateDamage(cards: Card[]): number {
     return cards.reduce((sum, card) => sum + card.damage, 0);
   }
@@ -466,10 +465,10 @@ export class GamesService {
 
     // Update game in DB
     await this.updateGame(
-      {id: gameId},
+      { id: gameId },
       {
-        winner: {connect: {id: winnerId}},
-        loser: {connect: {id: loserId}}
+        winner: { connect: { id: winnerId } },
+        loser: { connect: { id: loserId } }
       }
     );
 
@@ -487,7 +486,7 @@ export class GamesService {
    * @returns The created game
    */
   async createGame(data: Prisma.GameCreateInput): Promise<Game> {
-    return await this.prisma.game.create({data});
+    return await this.prisma.game.create({ data });
   }
 
   /**
@@ -501,6 +500,6 @@ export class GamesService {
     where: Prisma.GameWhereUniqueInput,
     data: Prisma.GameUpdateInput
   ): Promise<Game> {
-    return await this.prisma.game.update({where, data});
+    return await this.prisma.game.update({ where, data });
   }
 }

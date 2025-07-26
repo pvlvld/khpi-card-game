@@ -1,6 +1,6 @@
-import {AuthGuard} from "@nestjs/passport";
-import {Request} from "express";
-import {Account} from "generated/prisma";
+import { AuthGuard } from "@nestjs/passport";
+import { Request } from "express";
+import { Account } from "generated/prisma";
 
 export interface RequestWithUser extends Request {
   user: Account;

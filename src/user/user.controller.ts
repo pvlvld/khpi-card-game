@@ -6,11 +6,11 @@ import {
   BadRequestException,
   Req
 } from "@nestjs/common";
-import {FileInterceptor} from "@nestjs/platform-express";
-import {UsersService} from "./user.service";
-import {memoryStorage} from "multer";
-import {Request} from "express";
-import {JwtService} from "@nestjs/jwt";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { UsersService } from "./user.service";
+import { memoryStorage } from "multer";
+import { Request } from "express";
+import { JwtService } from "@nestjs/jwt";
 
 @Controller("users")
 export class UsersController {
@@ -23,7 +23,7 @@ export class UsersController {
   @UseInterceptors(
     FileInterceptor("avatar", {
       storage: memoryStorage(),
-      limits: {fileSize: 5 * 1024 * 1024},
+      limits: { fileSize: 5 * 1024 * 1024 },
       fileFilter: (req, file, cb) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
           return cb(

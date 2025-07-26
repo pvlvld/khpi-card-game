@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { GameState } from './interfaces/game-state.interface';
+import { Injectable } from "@nestjs/common";
+import { GameState } from "./interfaces/game-state.interface";
 
 @Injectable()
 export class GameStateService {
@@ -24,4 +24,4 @@ export class GameStateService {
   getAllGames(): Map<number, GameState> {
     return this.activeGames;
   }
-} 
+}

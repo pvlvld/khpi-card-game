@@ -7,11 +7,11 @@ import {
   ConnectedSocket,
   MessageBody
 } from "@nestjs/websockets";
-import {forwardRef, Inject} from "@nestjs/common";
-import {Server, Socket} from "socket.io";
-import {MatchmakingService} from "./matchmaking.service";
+import { forwardRef, Inject } from "@nestjs/common";
+import { Server, Socket } from "socket.io";
+import { MatchmakingService } from "./matchmaking.service";
 import * as jwt from "jsonwebtoken";
-import {UsersService} from "src/user/user.service";
+import { UsersService } from "src/user/user.service";
 
 @WebSocketGateway({
   cors: {
@@ -60,9 +60,9 @@ export class MatchmakingGateway
       return;
     }
 
-    let payload: {username?: string};
+    let payload: { username?: string };
     try {
-      payload = jwt.decode(token) as {username?: string};
+      payload = jwt.decode(token) as { username?: string };
     } catch (e) {
       client.emit("error", "Invalid JWT token");
       return;
@@ -73,7 +73,9 @@ export class MatchmakingGateway
       return;
     }
 
-    const user = await this.usersService.findOne({username: payload.username});
+    const user = await this.usersService.findOne({
+      username: payload.username
+    });
 
     if (!user) {
       client.emit("error", "User not found");
