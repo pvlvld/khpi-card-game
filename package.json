@@ -59,6 +59,7 @@
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.3",
+    "git-format-staged": "^3.1.1",
     "globals": "^16.3.0",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
