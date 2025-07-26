@@ -23,7 +23,7 @@
 
 ```bash
 $ git clone https://github.com/pvlvld/khpi-card-game backend
-$ git clone $ git clone https://github.com/pvlvld/khpi-card-game frontend
+$ git clone https://github.com/Corkerro/cardgame-frontend/ frontend
 $ cd backend && npm i && npx prisma generate && cd ..
 $ cd frontend && npm i && cd ..
 ```
