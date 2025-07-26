@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import * as cookieParser from "cookie-parser";
 import { NestExpressApplication } from "@nestjs/platform-express";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { join } from "path";
 
 const ALLOWED_CORS_ORIGINS = [
@@ -39,6 +40,22 @@ async function bootstrap() {
     prefix: "/avatars/"
   });
 
+  initializeSwagger(app);
+
   await app.listen(process.env.NEST_PORT ?? 3069);
 }
+
+function initializeSwagger(app: any) {
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("Simple Pastebin API")
+    .setDescription("The Simple Pastebin API description")
+    .setVersion("1.0")
+    .addTag("paste")
+    .build();
+
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup("api", app, documentFactory);
+}
+
 bootstrap();
