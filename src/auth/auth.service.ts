@@ -17,7 +17,7 @@ export class AuthService {
     private prisma: PrismaService
   ) {}
 
-  async signUp(username: string, password: string): Promise<any> {
+  async register(username: string, password: string): Promise<any> {
     if (!username || !password) {
       throw new UnauthorizedException("Username and password are required");
     }
@@ -66,14 +66,14 @@ export class AuthService {
   }
 
   // TODO: OAuth
-  async signIn(username: string, password: string): Promise<string> {
+  async login(username: string, password: string): Promise<string> {
     if (!username || !password) {
       throw new UnauthorizedException("Username and password are required");
     }
 
     const account = await this.accountService.findUnique({ username });
 
-    return await this.login(account!);
+    return await this.generateJwt(account!);
   }
 
   async validateUser(
@@ -92,7 +92,7 @@ export class AuthService {
     return account;
   }
 
-  async login(account: Account): Promise<string> {
+  async generateJwt(account: Account): Promise<string> {
     return this.jwtService.signAsync({
       sub: account.id,
       username: account.username

@@ -18,13 +18,10 @@ export class AuthController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post("register")
-  async signUp(
-    @Body() signUpDto: Record<string, any>,
-    @Res() response: Response
-  ) {
-    const jwt = await this.authService.signUp(
-      signUpDto.username,
-      signUpDto.password
+  async register(@Body() registerDto: RegisterDto, @Res() response: Response) {
+    const jwt = await this.authService.register(
+      registerDto.username,
+      registerDto.password
     );
 
     const expires = new Date();
@@ -38,8 +35,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post("login")
-  async signIn(@Req() request: RequestWithUser, @Res() response: Response) {
-    const jwt = await this.authService.login(request.user);
+  async login(@Req() request: RequestWithUser, @Res() response: Response) {
+    const jwt = await this.authService.generateJwt(request.user);
 
     const expires = new Date();
     expires.setDate(expires.getDate() + 30);
