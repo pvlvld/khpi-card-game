@@ -7,7 +7,7 @@ import {
   ConnectedSocket,
   MessageBody
 } from "@nestjs/websockets";
-import { forwardRef, Inject } from "@nestjs/common";
+import { forwardRef, Inject, Logger } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { MatchmakingService } from "./matchmaking.service";
 import * as jwt from "jsonwebtoken";
@@ -30,15 +30,16 @@ export class MatchmakingGateway
   constructor(
     @Inject(forwardRef(() => MatchmakingService))
     private readonly matchmakingService: MatchmakingService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly logger: Logger = new Logger(MatchmakingGateway.name)
   ) {}
 
   async handleConnection(client: Socket) {
-    console.log(`Matchmaking client connected: ${client.id}`);
+    this.logger.log(`Matchmaking client connected: ${client.id}`);
   }
 
   async handleDisconnect(client: Socket) {
-    console.log(`Matchmaking client disconnected: ${client.id}`);
+    this.logger.log(`Matchmaking client disconnected: ${client.id}`);
     await this.matchmakingService.removeFromQueue(client.id);
   }
 
