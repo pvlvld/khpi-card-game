@@ -14,7 +14,12 @@ import { UsersService } from "./user.service";
 import { memoryStorage } from "multer";
 import { Request } from "express";
 import { JwtService } from "@nestjs/jwt";
-import { ApiOperation, ApiResponse } from "@nestjs/swagger";
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse
+} from "@nestjs/swagger";
 
 @Controller("users")
 export class UsersController {
@@ -53,6 +58,20 @@ export class UsersController {
       }
     })
   )
+  @ApiConsumes("multipart/form-data")
+  @ApiBody({
+    schema: {
+      type: "object",
+      properties: {
+        avatar: {
+          type: "string",
+          format: "binary",
+          description: "Avatar image file (jpg, jpeg, png, webp)"
+        }
+      },
+      required: ["avatar"]
+    }
+  })
   async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: Request
