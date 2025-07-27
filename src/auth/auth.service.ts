@@ -22,6 +22,18 @@ export class AuthService {
       throw new UnauthorizedException("Username and password are required");
     }
 
+    if (password.length < 6 || password.length > 100) {
+      throw new ConflictException(
+        "Password must be at least 6 characters long and at most 100 characters long"
+      );
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      throw new ConflictException(
+        "Username must be at least 3 characters long and at most 20 characters long"
+      );
+    }
+
     const existingUser = await this.accountService.findUnique({ username });
     if (existingUser) {
       throw new ConflictException("Username already exists");
