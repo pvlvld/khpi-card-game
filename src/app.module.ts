@@ -11,9 +11,11 @@ import { UsersService } from "./user/user.service";
 import { AccountService } from "./account/account.service";
 import { AccountModule } from "./account/account.module";
 import { CardService } from "./card/card.service";
+import { AppConfigModule } from "./config/config.module";
 
 @Module({
   imports: [
+    AppConfigModule,
     AuthModule,
     UsersModule,
     GamesModule,
