@@ -3,6 +3,7 @@ import { AppModule } from "./app.module";
 import * as cookieParser from "cookie-parser";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { ValidationPipe } from "@nestjs/common";
 import { join } from "path";
 
 const ALLOWED_CORS_ORIGINS = [
@@ -35,6 +36,18 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true
+      },
+      stopAtFirstError: true
+    })
+  );
 
   app.useStaticAssets(join(__dirname, "..", "uploads", "avatars"), {
     prefix: "/avatars/"
