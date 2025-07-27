@@ -4,13 +4,17 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
-  Req
+  Req,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { UsersService } from "./user.service";
 import { memoryStorage } from "multer";
 import { Request } from "express";
 import { JwtService } from "@nestjs/jwt";
+import { ApiOperation, ApiResponse } from "@nestjs/swagger";
 
 @Controller("users")
 export class UsersController {
@@ -19,7 +23,21 @@ export class UsersController {
     private readonly jwtService: JwtService
   ) {}
 
+  @HttpCode(HttpStatus.OK)
   @Post("avatar")
+  @ApiOperation({ summary: "Upload user avatar" })
+  @ApiResponse({
+    status: 200,
+    description: "Avatar successfully uploaded"
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Invalid input data or no file uploaded"
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid credentials"
+  })
   @UseInterceptors(
     FileInterceptor("avatar", {
       storage: memoryStorage(),
@@ -42,17 +60,17 @@ export class UsersController {
     if (!file) throw new BadRequestException("No file uploaded");
 
     const token = req.cookies?.jwt;
-    if (!token) throw new BadRequestException("No JWT cookie found");
+    if (!token) throw new UnauthorizedException("No JWT cookie found");
 
     let payload: any;
     try {
       payload = this.jwtService.verify(token); // Throws if invalid
     } catch (e) {
-      throw new BadRequestException("Invalid JWT token");
+      throw new UnauthorizedException("Invalid JWT token");
     }
 
     const username = payload?.username;
-    if (!username) throw new BadRequestException("Invalid JWT payload");
+    if (!username) throw new UnauthorizedException("Invalid JWT payload");
 
     return this.usersService.uploadAvatarByUsername(username, file);
   }
