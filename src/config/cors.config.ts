@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { CorsOptions } from "@nestjs/common/interfaces/external/cors-options.interface";
 import { IAppConfig } from "./config.module";
@@ -13,6 +13,7 @@ export interface CorsConfig {
 @Injectable()
 export class CorsConfigService {
   private readonly config: CorsConfig;
+  private readonly logger = new Logger(CorsConfigService.name);
 
   constructor(private readonly configService: ConfigService<IAppConfig>) {
     this.config = this.createConfig();
@@ -43,7 +44,7 @@ export class CorsConfigService {
           return callback(null, true);
         }
 
-        console.warn(`[CORS] Origin ${origin} not allowed`);
+        this.logger.warn(`Origin ${origin} not allowed`);
         callback(new Error(`Origin ${origin} not allowed by CORS`), false);
       },
       methods: this.config.allowedMethods,
@@ -54,9 +55,11 @@ export class CorsConfigService {
 
   public logConfiguration(): void {
     const nodeEnv = this.configService.get("NODE_ENV");
-    console.log(`[CORS] Environment: ${nodeEnv}`);
-    console.log(`[CORS] Allowed origins:`, this.config.allowedOrigins);
-    console.log(`[CORS] Credentials enabled: ${this.config.allowCredentials}`);
+    this.logger.log(`[CORS] Environment: ${nodeEnv}`);
+    this.logger.log(`[CORS] Allowed origins:`, this.config.allowedOrigins);
+    this.logger.log(
+      `[CORS] Credentials enabled: ${this.config.allowCredentials}`
+    );
   }
 
   private createConfig(): CorsConfig {
