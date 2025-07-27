@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from "@nestjs/common";
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException
+} from "@nestjs/common";
 import { Prisma, User } from "generated/prisma";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as fs from "fs";
@@ -30,7 +34,7 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-      throw new BadRequestException("User not found");
+      throw new UnauthorizedException("User not found");
     }
 
     const image = sharp(file.buffer);
