@@ -33,12 +33,25 @@ export class UsersService {
       throw new BadRequestException("User not found");
     }
 
-    // Check file sizes
     const image = sharp(file.buffer);
     const metadata = await image.metadata();
 
     if (!metadata.width || !metadata.height) {
       throw new BadRequestException("Invalid image file");
+    }
+
+    if (
+      !["image/webp", "image/jpg", "image/jpeg", "image/png"].includes(
+        file.mimetype
+      )
+    ) {
+      throw new BadRequestException(
+        "Only JPEG, PNG, and WEBP images are allowed"
+      );
+    }
+
+    if (metadata.size && metadata.size > 5 * 1024 * 1024) {
+      throw new BadRequestException("Image size must not exceed 5MB");
     }
 
     if (
@@ -52,7 +65,6 @@ export class UsersService {
       );
     }
 
-    // Deleting old ava is exist
     if (user.avatarUrl) {
       const oldAvatarPath = path.join(this.uploadDir, user.avatarUrl);
       if (fs.existsSync(oldAvatarPath)) {
@@ -60,14 +72,10 @@ export class UsersService {
       }
     }
 
-    // Always save in .jpg, name is fixed
     const fileName = `${user.username}_ava.jpg`;
     const filePath = path.join(this.uploadDir, fileName);
 
-    // Converting in JPEG and saving
-    await sharp(file.buffer)
-      .jpeg({ quality: 85 }) // quality can be changed
-      .toFile(filePath);
+    await sharp(file.buffer).jpeg({ quality: 85 }).toFile(filePath);
 
     return this.prisma.user.update({
       where: { id: userId },
