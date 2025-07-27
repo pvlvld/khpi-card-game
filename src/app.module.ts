@@ -12,6 +12,7 @@ import { AccountService } from "./account/account.service";
 import { AccountModule } from "./account/account.module";
 import { CardService } from "./card/card.service";
 import { AppConfigModule } from "./config/config.module";
+import { CorsConfigService } from "./config/cors.config";
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AppConfigModule } from "./config/config.module";
     PrismaService,
     UsersService,
     AccountService,
-    CardService
+    CardService,
+    CorsConfigService
   ]
 })
 export class AppModule {}

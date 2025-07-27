@@ -12,10 +12,11 @@ import { WsJwtGuard } from "src/auth/guards/ws-jwt.guard";
 import { JwtService } from "@nestjs/jwt";
 import { GamesService } from "./game.service";
 import { Socket, Server } from "socket.io";
+import { createCorsOrigins } from "../config/cors.config";
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: createCorsOrigins(),
     credentials: true
   },
   namespace: "game"

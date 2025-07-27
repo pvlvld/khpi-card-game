@@ -5,36 +5,16 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { join } from "path";
-
-const ALLOWED_CORS_ORIGINS = [
-  "http://localhost",
-  "http://127.0.0.1",
-  "https://localhost",
-  "https://127.0.0.1",
-  `${process.env.FRONTEND_URL}`
-];
+import { CorsConfigService } from "./config/cors.config";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.enableCors({
-    origin: (origin, callback) => {
-      if (
-        !origin ||
-        ALLOWED_CORS_ORIGINS.some((allowedOrigin) =>
-          origin.startsWith(allowedOrigin)
-        )
-      ) {
-        return callback(null, true);
-      }
+  const corsService = app.get(CorsConfigService);
 
-      callback(new Error("Not allowed by CORS"), false);
-    },
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-    allowedHeaders: "Content-Type, Accept, Authorization"
-  });
+  corsService.logConfiguration();
 
+  app.enableCors(corsService.getCorsOptions());
   app.use(cookieParser());
 
   app.useGlobalPipes(

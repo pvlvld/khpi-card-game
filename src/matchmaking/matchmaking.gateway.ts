@@ -12,10 +12,11 @@ import { Server, Socket } from "socket.io";
 import { MatchmakingService } from "./matchmaking.service";
 import * as jwt from "jsonwebtoken";
 import { UsersService } from "src/user/user.service";
+import { createCorsOrigins } from "../config/cors.config";
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: createCorsOrigins(),
     credentials: true
   },
   namespace: "matchmaking"
