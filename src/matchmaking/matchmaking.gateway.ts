@@ -27,11 +27,11 @@ export class MatchmakingGateway
   @WebSocketServer()
   server: Server;
 
+  private readonly logger: Logger = new Logger(MatchmakingGateway.name);
   constructor(
     @Inject(forwardRef(() => MatchmakingService))
     private readonly matchmakingService: MatchmakingService,
-    private readonly usersService: UsersService,
-    private readonly logger: Logger = new Logger(MatchmakingGateway.name)
+    private readonly usersService: UsersService
   ) {}
 
   async handleConnection(client: Socket) {
