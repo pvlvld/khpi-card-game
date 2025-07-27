@@ -8,6 +8,7 @@ import * as argon2 from "@node-rs/argon2";
 import { Account } from "generated/prisma";
 import { AccountService } from "src/account/account.service";
 import { PrismaService } from "src/prisma/prisma.service";
+import { JwtPayloadDto } from "./dto/auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -93,9 +94,11 @@ export class AuthService {
   }
 
   async generateJwt(account: Account): Promise<string> {
-    return this.jwtService.signAsync({
+    const payload: JwtPayloadDto = {
       sub: account.id,
       username: account.username
-    });
+    };
+
+    return this.jwtService.signAsync(payload);
   }
 }

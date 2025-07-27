@@ -8,16 +8,30 @@ import {
   UseGuards,
   Req
 } from "@nestjs/common";
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { Response } from "express";
 import { LocalAuthGuard, RequestWithUser } from "./guards/local-auth.guard";
+import { RegisterDto, LoginDto, AuthResponseDto } from "./dto/auth.dto";
 
+@ApiTags("Authentication")
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post("register")
+  @ApiOperation({ summary: "Register a new user" })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: "User successfully registered",
+    type: AuthResponseDto
+  })
+  @ApiResponse({
+    status: 409,
+    description: "Username already exists or invalid input"
+  })
   async register(@Body() registerDto: RegisterDto, @Res() response: Response) {
     const jwt = await this.authService.register(
       registerDto.username,
@@ -35,6 +49,17 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @Post("login")
+  @ApiOperation({ summary: "Login user" })
+  @ApiBody({ type: LoginDto })
+  @ApiResponse({
+    status: 200,
+    description: "User successfully logged in",
+    type: AuthResponseDto
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid credentials"
+  })
   async login(@Req() request: RequestWithUser, @Res() response: Response) {
     const jwt = await this.authService.generateJwt(request.user);
 
