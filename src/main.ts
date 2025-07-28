@@ -40,10 +40,15 @@ async function bootstrap() {
 
 function initializeSwagger(app: any) {
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("Simple Pastebin API")
-    .setDescription("The Simple Pastebin API description")
+    .setTitle("Acehole card game API")
+    .setDescription("The Acehole card game API description")
     .setVersion("1.0")
-    .addTag("paste")
+    .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "JWT" })
+    .addCookieAuth("jwt", {
+      type: "http",
+      scheme: "bearer",
+      bearerFormat: "JWT"
+    })
     .build();
 
   const documentFactory = () =>
